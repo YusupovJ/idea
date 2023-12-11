@@ -1,5 +1,3 @@
--- migrate:up
-
 CREATE TABLE `users` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `email` varchar(255) UNIQUE,
@@ -161,6 +159,7 @@ ALTER TABLE `products_categories` ADD FOREIGN KEY (`products_id`) REFERENCES `pr
 
 ALTER TABLE `products_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`);
 
+
 CREATE TABLE `events_products` (
   `events_id` integer,
   `products_id` integer,
@@ -170,6 +169,7 @@ CREATE TABLE `events_products` (
 ALTER TABLE `events_products` ADD FOREIGN KEY (`events_id`) REFERENCES `events` (`id`);
 
 ALTER TABLE `events_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`);
+
 
 CREATE TABLE `attribute_values_products` (
   `attribute_values_id` integer,
@@ -181,6 +181,7 @@ ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`attribute_values_id`) 
 
 ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`);
 
+
 CREATE TABLE `attributes_categories` (
   `attributes_id` integer,
   `categories_id` integer,
@@ -191,6 +192,3 @@ ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`attributes_id`) REFERENCES
 
 ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`);
 
--- migrate:down
-
-DROP DATABASE kishmish;
