@@ -1,5 +1,6 @@
 CREATE TABLE `users` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `name` varchar(255),
   `email` varchar(255) UNIQUE,
   `password` varchar(255),
   `role` ENUM ('user', 'admin', 'moderator', 'deliver'),
