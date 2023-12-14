@@ -4,7 +4,7 @@ const apiResponse = (res) => {
 			const response = {
 				data,
 				pagination,
-				error: null,
+				errors: null,
 				date: new Date(),
 			};
 
@@ -15,7 +15,7 @@ const apiResponse = (res) => {
 			const response = {
 				data: null,
 				pagination: null,
-				error: message,
+				errors: message,
 				date: new Date(),
 			};
 
