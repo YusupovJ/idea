@@ -132,23 +132,23 @@ ALTER TABLE `cart` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELE
 
 ALTER TABLE `reviews` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `reviews` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ;
+ALTER TABLE `reviews` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `reviews` ADD FOREIGN KEY (`answer_to`) REFERENCES `reviews` (`id`);
+ALTER TABLE `reviews` ADD FOREIGN KEY (`answer_to`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `address` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `address` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `delivery` ADD FOREIGN KEY (`address_id`) REFERENCES `address` (`id`);
+ALTER TABLE `delivery` ADD FOREIGN KEY (`address_id`) REFERENCES `address` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `delivery` ADD FOREIGN KEY (`deliver_id`) REFERENCES `users` (`id`);
+ALTER TABLE `delivery` ADD FOREIGN KEY (`deliver_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `orders` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+ALTER TABLE `orders` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `orders` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `orders` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `orders` ADD FOREIGN KEY (`delivery_id`) REFERENCES `delivery` (`id`);
+ALTER TABLE `orders` ADD FOREIGN KEY (`delivery_id`) REFERENCES `delivery` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
-ALTER TABLE `attribute_values` ADD FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`);
+ALTER TABLE `attribute_values` ADD FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 CREATE TABLE `products_categories` (
   `products_id` integer,
@@ -156,9 +156,9 @@ CREATE TABLE `products_categories` (
   PRIMARY KEY (`products_id`, `categories_id`)
 );
 
-ALTER TABLE `products_categories` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`);
+ALTER TABLE `products_categories` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `products_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`);
+ALTER TABLE `products_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 CREATE TABLE `events_products` (
@@ -167,10 +167,10 @@ CREATE TABLE `events_products` (
   PRIMARY KEY (`events_id`, `products_id`)
 );
 
-ALTER TABLE `events_products` ADD FOREIGN KEY (`events_id`) REFERENCES `events` (`id`);
+ALTER TABLE `events_products` ADD FOREIGN KEY (`events_id`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `events_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`);
-ER
+ALTER TABLE `events_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 CREATE TABLE `attribute_values_products` (
   `attribute_values_id` integer,
@@ -178,9 +178,9 @@ CREATE TABLE `attribute_values_products` (
   PRIMARY KEY (`attribute_values_id`, `products_id`)
 );
 
-ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`attribute_values_id`) REFERENCES `attribute_values` (`id`);
+ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`attribute_values_id`) REFERENCES `attribute_values` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`);
+ALTER TABLE `attribute_values_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 CREATE TABLE `attributes_categories` (
@@ -189,7 +189,7 @@ CREATE TABLE `attributes_categories` (
   PRIMARY KEY (`attributes_id`, `categories_id`)
 );
 
-ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`attributes_id`) REFERENCES `attributes` (`id`);
+ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`attributes_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`);
+ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
