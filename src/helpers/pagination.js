@@ -1,10 +1,11 @@
 class Pagination {
-    constructor(totalItems, currentPage = 1, limit = 10) {
-        this.totalItems = totalItems;
-        this.currentPage = currentPage;
-        this.limit = limit;
-        this.offset = (this.currentPage - 1) * this.limit;
-    }
+	constructor(totalItems, currentPage, limit) {
+		this.totalItems = totalItems;
+		this.currentPage = parseInt(currentPage) || 1;
+		this.limit = parseInt(limit) || 15;
+		this.offset = (this.currentPage - 1) * this.limit;
+		this.totalPages = Math.ceil(this.totalItems / this.limit);
+	}
 }
 
 export default Pagination;

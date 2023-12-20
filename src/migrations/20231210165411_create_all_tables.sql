@@ -21,8 +21,8 @@ CREATE TABLE `products` (
   `desc_short_uz` text,
   `desc_short_ru` text,
   `count` integer,
-  `views` integer,
-  `orders` integer,
+  `views` integer DEFAULT 0,
+  `orders` integer DEFAULT 0,
   `images` text,
   `price` integer,
   `discount` float,
@@ -194,6 +194,7 @@ CREATE TABLE `attributes_categories` (
 ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`attributes_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 -- migrate:down
 
