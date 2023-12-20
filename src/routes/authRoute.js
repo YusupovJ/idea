@@ -2,11 +2,11 @@ import { Router } from "express";
 import { login, logout, refresh, register } from "../controllers/authController.js";
 import roleGuard from "../middlewares/roleGuard.js";
 
-const authRouter = Router();
+const authRoute = Router();
 
-authRouter.post("/register", register);
-authRouter.post("/login", login);
-authRouter.post("/refresh", refresh);
-authRouter.post("/logout", roleGuard("user"), logout);
+authRoute.post("/register", register);
+authRoute.post("/login", login);
+authRoute.post("/refresh", refresh);
+authRoute.post("/logout", roleGuard("user"), logout);
 
-export default authRouter;
+export default authRoute;
