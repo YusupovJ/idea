@@ -1,5 +1,5 @@
 import apiResponse from "../helpers/apiResponse.js";
-import throwError from "../helpers/throwError.js";
+import { Forbidden } from "../helpers/errors.js";
 import authGuard from "./authGuard.js";
 
 const roleGuard = (...roles) => {
@@ -8,7 +8,7 @@ const roleGuard = (...roles) => {
 		(req, res, next) => {
 			try {
 				if (!roles.includes(req.role)) {
-					throwError("You do not have enough rights", 403);
+					throw new Forbidden("You do not have an access");
 				}
 
 				next();
