@@ -5,20 +5,20 @@ import { BadRequest, NotFound } from "../helpers/errors.js";
 
 const add = async (req, res) => {
     try {
-        const createCategoryDTO = req.body;
+        const { body } = req;
         const newCategory = {
-            name_uz: createCategoryDTO.name_uz,
-            name_ru: createCategoryDTO.name_ru,
-            desc_uz: createCategoryDTO.desc_uz,
-            desc_ru: createCategoryDTO.desc_ru,
-            images: createCategoryDTO.images,
-            parent_id: createCategoryDTO.parent_id,
+            name_uz: body.name_uz,
+            name_ru: body.name_ru,
+            desc_uz: body.desc_uz,
+            desc_ru: body.desc_ru,
+            images: body.images,
+            parent_id: body.parent_id,
         };
 
         const [{ insertId }] = await db.query("INSERT INTO categories SET ?", newCategory);
         const [[addedCategory]] = await db.query("SELECT * FROM categories WHERE id = ?", insertId);
 
-        const { attributes } = createCategoryDTO;
+        const { attributes } = body;
 
         if (attributes) {
             for (const attributeId of attributes) {
@@ -43,12 +43,12 @@ const add = async (req, res) => {
 
 const getAll = async (req, res) => {
     try {
-        const [[{ "COUNT(id)": totalItems }]] = await db.query("SELECT COUNT(id) FROM categories WHERE parent_id = NULL");
+        const [[{ "COUNT(id)": totalItems }]] = await db.query("SELECT COUNT(id) FROM categories WHERE parent_id IS NULL");
 
         const { page, limit } = req.query;
         const pagination = new Pagination(totalItems, page, limit);
 
-        const [categories] = await db.query("SELECT * FROM categories LIMIT ? OFFSET ? WHERE parent_id = NULL", [pagination.limit, pagination.offset]);
+        const [categories] = await db.query("SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?", [pagination.limit, pagination.offset]);
 
         apiResponse(res).send(categories, pagination);
     } catch (error) {

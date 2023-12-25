@@ -5,23 +5,23 @@ import { BadRequest, NotFound } from "../helpers/errors.js";
 
 const add = async (req, res) => {
     try {
-        const createProductDTO = req.body;
+        const { body } = req;
         const newProduct = {
-            name_uz: createProductDTO.name_uz,
-            name_ru: createProductDTO.name_ru,
-            desc_uz: createProductDTO.desc_uz,
-            desc_ru: createProductDTO.desc_ru,
-            desc_short_uz: createProductDTO.desc_short_uz,
-            desc_short_ru: createProductDTO.desc_short_ru,
-            images: createProductDTO.images,
-            price: createProductDTO.price,
-            discount: createProductDTO.discount,
+            name_uz: body.name_uz,
+            name_ru: body.name_ru,
+            desc_uz: body.desc_uz,
+            desc_ru: body.desc_ru,
+            desc_short_uz: body.desc_short_uz,
+            desc_short_ru: body.desc_short_ru,
+            images: body.images,
+            price: body.price,
+            discount: body.discount,
         };
 
         const [{ insertId }] = await db.query("INSERT INTO products SET ?", newProduct);
         const [[addedProduct]] = await db.query("SELECT * FROM products WHERE id = ?", insertId);
 
-        const { categories, events, attributeValues } = createProductDTO;
+        const { categories, events, attributeValues } = body;
 
         if (categories) {
             for (const categoryId of categories) {
