@@ -1,3 +1,9 @@
+/* 
+    Pagination helper with needed formuls.
+
+    offset - property that returns how many items we skipped
+*/
+
 class Pagination {
 	constructor(totalItems, currentPage, limit) {
 		this.totalItems = totalItems;

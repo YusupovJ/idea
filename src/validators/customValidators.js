@@ -9,6 +9,7 @@ export const paginationQuery = (input) => {
 };
 
 export const isUzMobilePhone = (input) => {
+	// Right format example: +998901234567
 	const regexp = /\+998(90|91|93|94|50|55|88|97|98|95|99|33)[0-9]{7}$/;
 	return regexp.test(input);
 };

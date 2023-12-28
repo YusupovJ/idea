@@ -1,3 +1,6 @@
+/* 
+    Classes for throwing errors.
+*/
 class MyError {
 	constructor(message, status) {
 		this.message = message;

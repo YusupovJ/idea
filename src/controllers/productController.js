@@ -4,58 +4,56 @@ import Pagination from "../helpers/pagination.js";
 import { BadRequest, NotFound } from "../helpers/errors.js";
 import checkValidation from "../helpers/checkValidation.js";
 
-const addManyToManyTables = async (body, id) => {
-	const { categories, events, attributeValues } = body;
+/* 
+    addCategories, addEvents, addAttributeValues are functions for
+    adding their id into the tables with relation - many to many
+*/
 
-	if (categories) {
-		for (const categoryId of categories) {
-			const [[category]] = await db.query(
-				"SELECT * FROM categories WHERE id = ?",
-				categoryId
-			);
+const addCategories = async (categories, products_id) => {
+	for (const categoryId of categories) {
+		const [[category]] = await db.query("SELECT * FROM categories WHERE id = ?", categoryId);
 
-			if (!category) {
-				throw new BadRequest(`There are no categories with ${categoryId} id`);
-			}
-
-			await db.query("INSERT INTO products_categories SET ?", {
-				categories_id: categoryId,
-				products_id: id,
-			});
+		if (!category) {
+			throw new BadRequest(`There are no categories with ${categoryId} id`);
 		}
+
+		await db.query("INSERT INTO products_categories SET ?", {
+			categories_id: categoryId,
+			products_id,
+		});
 	}
+};
 
-	if (events) {
-		for (const eventId of events) {
-			const [[event]] = await db.query("SELECT * FROM events WHERE id = ?", eventId);
+const addEvents = async (events, products_id) => {
+	for (const eventId of events) {
+		const [[event]] = await db.query("SELECT * FROM events WHERE id = ?", eventId);
 
-			if (!event) {
-				throw new BadRequest(`There are no events with ${eventId} id`);
-			}
-
-			await db.query("INSERT INTO events_products SET ?", {
-				events_id: eventId,
-				products_id: id,
-			});
+		if (!event) {
+			throw new BadRequest(`There are no events with ${eventId} id`);
 		}
+
+		await db.query("INSERT INTO events_products SET ?", {
+			events_id: eventId,
+			products_id,
+		});
 	}
+};
 
-	if (attributeValues) {
-		for (const attributeValueId of attributeValues) {
-			const [[event]] = await db.query(
-				"SELECT * FROM attribute_values WHERE id = ?",
-				attributeValueId
-			);
+const addAttributeValues = async (attributeValues, products_id) => {
+	for (const attributeValueId of attributeValues) {
+		const [[event]] = await db.query(
+			"SELECT * FROM attribute_values WHERE id = ?",
+			attributeValueId
+		);
 
-			if (!event) {
-				throw new BadRequest(`There are no attributes with ${attributeValueId} id`);
-			}
-
-			await db.query("INSERT INTO attribute_values_products SET ?", {
-				attribute_values_id: attributeValueId,
-				products_id: id,
-			});
+		if (!event) {
+			throw new BadRequest(`There are no attributes with ${attributeValueId} id`);
 		}
+
+		await db.query("INSERT INTO attribute_values_products SET ?", {
+			attribute_values_id: attributeValueId,
+			products_id,
+		});
 	}
 };
 
@@ -79,7 +77,19 @@ const add = async (req, res) => {
 		const [{ insertId }] = await db.query("INSERT INTO products SET ?", newProduct);
 		const [[addedProduct]] = await db.query("SELECT * FROM products WHERE id = ?", insertId);
 
-		await addManyToManyTables(body, insertId);
+		const { categories, events, attributeValues } = body;
+
+		if (categories) {
+			await addCategories(categories, insertId);
+		}
+
+		if (events) {
+			await addEvents(categories, insertId);
+		}
+
+		if (attributeValues) {
+			await addAttributeValues(categories, insertId);
+		}
 
 		apiResponse(res).send(addedProduct, null, 201);
 	} catch (error) {
@@ -122,7 +132,22 @@ const update = async (req, res) => {
 
 		await db.query("UPDATE products SET ? WHERE id = ?", [updatedProduct, id]);
 
-		await addManyToManyTables(body, id);
+		const { categories, events, attributeValues } = body;
+
+		if (categories) {
+			await db.query("DELETE FROM products_categories WHERE products_id = ?", id);
+			await addCategories(categories, insertId);
+		}
+
+		if (events) {
+			await db.query("DELETE FROM events_products WHERE products_id = ?", id);
+			await addEvents(categories, insertId);
+		}
+
+		if (attributeValues) {
+			await db.query("DELETE FROM attribute_values_products WHERE products_id = ?", id);
+			await addAttributeValues(categories, insertId);
+		}
 
 		apiResponse(res).send("Product was succefully updated", null, 201);
 	} catch (error) {

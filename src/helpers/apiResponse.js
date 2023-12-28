@@ -1,3 +1,9 @@
+/* 
+    Function for sending responses to the client.
+    Method send is for success data.
+    Method throw is for failed data. 
+*/
+
 const apiResponse = (res) => {
 	return {
 		send(data, pagination = null, status = 200) {

@@ -4,6 +4,10 @@ import env from "../config/env.config.js";
 const accessTokenSecret = env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = env.REFRESH_TOKEN_SECRET;
 
+/* 
+    Class Token for generating json web tokens.
+*/
+
 class Token {
 	generateAccessToken(id, role) {
 		const accessToken = jwt.sign({ id, role }, accessTokenSecret, { expiresIn: "15m" });

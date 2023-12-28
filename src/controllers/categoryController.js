@@ -3,6 +3,25 @@ import db from "../config/db.config.js";
 import Pagination from "../helpers/pagination.js";
 import { BadRequest, NotFound } from "../helpers/errors.js";
 
+/* 
+    if there are attributes, we put them into 
+    the attributes_categories table with products_id and attributes_id            
+*/
+const addAttributes = async (attributes, products_id) => {
+	for (const attributeId of attributes) {
+		const [[attribute]] = await db.query("SELECT * FROM attributes WHERE id = ?", attributeId);
+
+		if (!attribute) {
+			throw new BadRequest(`There are no attributes with ${attributeId} id`);
+		}
+
+		await db.query("INSERT INTO attributes_categories SET ?", {
+			attributes_id: attributeId,
+			products_id,
+		});
+	}
+};
+
 const add = async (req, res) => {
 	try {
 		const { body } = req;
@@ -21,21 +40,7 @@ const add = async (req, res) => {
 		const { attributes } = body;
 
 		if (attributes) {
-			for (const attributeId of attributes) {
-				const [[attribute]] = await db.query(
-					"SELECT * FROM attributes WHERE id = ?",
-					attributeId
-				);
-
-				if (!attribute) {
-					throw new BadRequest(`There are no attributes with ${attributeId} id`);
-				}
-
-				await db.query("INSERT INTO attributes_categories SET ?", {
-					attributes_id: attributeId,
-					products_id: insertId,
-				});
-			}
+			await addAttributes(attributes, insertId);
 		}
 
 		apiResponse(res).send(addedCategory, null, 201);
@@ -46,16 +51,15 @@ const add = async (req, res) => {
 
 const getAll = async (req, res) => {
 	try {
-		const [[{ "COUNT(id)": totalItems }]] = await db.query(
-			"SELECT COUNT(id) FROM categories WHERE parent_id IS NULL"
-		);
+		const getCountQuery = "SELECT COUNT(id) FROM categories WHERE parent_id IS NULL";
+		const [[{ "COUNT(id)": totalItems }]] = await db.query(getCountQuery);
 
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const [
-			categories,
-		] = await db.query("SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?", [
+		const getCategoriesQuery =
+			"SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?";
+		const [categories] = await db.query(getCategoriesQuery, [
 			pagination.limit,
 			pagination.offset,
 		]);
@@ -78,6 +82,13 @@ const update = async (req, res) => {
 		const updatedCategory = { ...req.body, updated_at: new Date() };
 
 		await db.query("UPDATE categories SET ? WHERE id = ?", [updatedCategory, id]);
+
+		const { attributes } = req.body;
+
+		if (attributes) {
+			await db.query("DELETE FROM attributes_categories WHERE products_id = ?", id);
+			await addAttributes(attributes, id);
+		}
 
 		apiResponse(res).send("Category was succefully updated", null, 201);
 	} catch (error) {

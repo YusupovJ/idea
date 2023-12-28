@@ -1,5 +1,9 @@
 import { randomBytes, scryptSync } from "crypto";
 
+/* 
+    For hashing and comparing hashed data.
+*/
+
 const encrypt = (string, salt) => {
 	return scryptSync(string, salt, 32).toString("hex");
 };

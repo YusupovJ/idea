@@ -5,6 +5,7 @@ import apiResponse from "../helpers/apiResponse.js";
 import { BadRequest } from "../helpers/errors.js";
 import checkValidation from "../helpers/checkValidation.js";
 
+/* Update refresh token */
 const updateUserRefreshToken = (newRefreshToken, userId) => {
 	const hashedRefreshToken = crypt.hash(newRefreshToken);
 	const updateQuery = "UPDATE users SET refresh_token = ? WHERE id = ?";

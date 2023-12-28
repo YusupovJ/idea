@@ -32,10 +32,15 @@ const update = async (req, res) => {
 			throw new NotFound("This user does not exist");
 		}
 
+		/* 
+            if role is moderator, we have an access for updating user, but if role
+            is user and id from database and our id are same, we also have an access
+        */
 		if (role === "moderator" || (role === "user" && id === paramsId)) {
 			const { body } = req;
 			const updatedUser = { ...body, updated_at: new Date() };
 
+			// if we change password, we hash it again
 			if (updatedUser.password) {
 				const newHashedPassword = crypt.hash(updatedUser.password);
 
@@ -63,6 +68,9 @@ const remove = async (req, res) => {
 			throw new NotFound("This user does not exist");
 		}
 
+		/* 
+            Same situation as in update handler.
+        */
 		if (role === "moderator" || (role === "user" && id === paramsId)) {
 			await db.query("DELETE FROM users WHERE id = ?", paramsId);
 
