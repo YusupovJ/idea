@@ -13,7 +13,7 @@ const roleGuard = (...roles) => {
 
 				next();
 			} catch (error) {
-				apiResponse(res).error(error.message, error.status);
+				apiResponse(res).throw(error);
 			}
 		},
 	];

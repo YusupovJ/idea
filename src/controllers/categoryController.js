@@ -40,7 +40,7 @@ const add = async (req, res) => {
 
 		apiResponse(res).send(addedCategory, null, 201);
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
@@ -62,7 +62,7 @@ const getAll = async (req, res) => {
 
 		apiResponse(res).send(categories, pagination);
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
@@ -81,7 +81,7 @@ const update = async (req, res) => {
 
 		apiResponse(res).send("Category was succefully updated", null, 201);
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
@@ -98,7 +98,7 @@ const remove = async (req, res) => {
 
 		apiResponse(res).send("Category was succefully deleted");
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 

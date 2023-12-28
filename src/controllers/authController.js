@@ -3,6 +3,7 @@ import crypt from "../helpers/hash.js";
 import token from "../helpers/generateTokens.js";
 import apiResponse from "../helpers/apiResponse.js";
 import { BadRequest } from "../helpers/errors.js";
+import checkValidation from "../helpers/checkValidation.js";
 
 const updateUserRefreshToken = (newRefreshToken, userId) => {
 	const hashedRefreshToken = crypt.hash(newRefreshToken);
@@ -13,6 +14,8 @@ const updateUserRefreshToken = (newRefreshToken, userId) => {
 
 export const register = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { email, password, phone, name } = req.body;
 		const selectQuery = "SELECT * FROM users WHERE email = ?";
 		const [[user]] = await db.query(selectQuery, email);
@@ -39,13 +42,14 @@ export const register = async (req, res) => {
 
 		updateUserRefreshToken(refreshToken, createdUser.insertId);
 	} catch (error) {
-		console.log(error);
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
 export const login = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { email, password } = req.body;
 		const selectQuery = "SELECT * FROM users WHERE email = ?";
 		const [[user]] = await db.query(selectQuery, email);
@@ -67,12 +71,14 @@ export const login = async (req, res) => {
 
 		updateUserRefreshToken(refreshToken, user.id);
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
 export const refresh = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { refreshToken } = req.body;
 		const decodedToken = token.verifyRefreshToken(refreshToken);
 
@@ -97,7 +103,7 @@ export const refresh = async (req, res) => {
 
 		updateUserRefreshToken(newRefreshToken, id);
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };
 
@@ -108,6 +114,6 @@ export const logout = async (req, res) => {
 
 		apiResponse(res).send("You successfully logged out your account");
 	} catch (error) {
-		apiResponse(res).error(error.message, error.status);
+		apiResponse(res).throw(error);
 	}
 };

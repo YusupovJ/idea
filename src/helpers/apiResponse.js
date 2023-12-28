@@ -4,22 +4,24 @@ const apiResponse = (res) => {
 			const response = {
 				data,
 				pagination,
-				errors: null,
+				error: null,
+				validationErrors: [],
 				date: new Date(),
 			};
 
 			res.status(status).json(response);
 		},
 
-		error(message, status = 500) {
+		throw(error) {
 			const response = {
 				data: null,
 				pagination: null,
-				errors: message,
+				error: error.message,
+				validationErrors: error.validationErrors || [],
 				date: new Date(),
 			};
 
-			res.status(status).json(response);
+			res.status(error.status || 500).json(response);
 		},
 	};
 };

@@ -32,3 +32,10 @@ export class NotFound extends MyError {
 		this.message = message;
 	}
 }
+
+export class ValidationError extends MyError {
+	constructor(errors) {
+		super("Validation error", 400);
+		this.validationErrors = errors;
+	}
+}
