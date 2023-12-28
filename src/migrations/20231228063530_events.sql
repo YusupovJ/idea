@@ -1,0 +1,55 @@
+-- migrate:up
+INSERT INTO events (name_uz, name_ru) VALUES ('Just Looking', 'Last Blitzkrieg, The');
+INSERT INTO events (name_uz, name_ru) VALUES ('Corrina, Corrina', 'Dancing Masters, The');
+INSERT INTO events (name_uz, name_ru) VALUES ('Common Man, A', 'Where East Is East');
+INSERT INTO events (name_uz, name_ru) VALUES ('Winterhawk', 'Harvey');
+INSERT INTO events (name_uz, name_ru) VALUES ('Boy Eating the Bird''s Food (To agori troei to fagito tou pouliou)', 'Titanic');
+INSERT INTO events (name_uz, name_ru) VALUES ('Bloody Bloody Bible Camp', 'Fast and the Furious, The');
+INSERT INTO events (name_uz, name_ru) VALUES ('World According to Monsanto, The (monde selon Monsanto, Le)', 'Presidentintekijät');
+INSERT INTO events (name_uz, name_ru) VALUES ('Jennifer 8', 'Crime and Punishment');
+INSERT INTO events (name_uz, name_ru) VALUES ('Seems Like Old Times', 'Training Day');
+INSERT INTO events (name_uz, name_ru) VALUES ('Opportunity Knocks', 'Prospero''s Books');
+INSERT INTO events (name_uz, name_ru) VALUES ('Comme les 5 doigts de la main', 'Earth (Zemlya)');
+INSERT INTO events (name_uz, name_ru) VALUES ('Wake Island', 'Double Dare');
+INSERT INTO events (name_uz, name_ru) VALUES ('Louise Bourgeois: The Spider, the Mistress and the Tangerine', 'Charlie Chan in Egypt');
+INSERT INTO events (name_uz, name_ru) VALUES ('American Affair, An', 'Prancer');
+INSERT INTO events (name_uz, name_ru) VALUES ('Gojoe: Spirit War Chronicle (Gojo reisenki: Gojoe)', 'Rich Hill');
+INSERT INTO events (name_uz, name_ru) VALUES ('House of Flying Daggers (Shi mian mai fu)', '911 in Plane Site');
+INSERT INTO events (name_uz, name_ru) VALUES ('Free Radicals:  A History of Experimental Film', 'Pepe');
+INSERT INTO events (name_uz, name_ru) VALUES ('Wedding Trough (Vase de noces)', 'Break-in');
+INSERT INTO events (name_uz, name_ru) VALUES ('Last House on the Left, The', 'Tuvalu');
+INSERT INTO events (name_uz, name_ru) VALUES ('Gorilla, The', 'Arnulf Rainer');
+INSERT INTO events (name_uz, name_ru) VALUES ('Soldier''s Plaything, A', 'Walking With Dinosaurs');
+INSERT INTO events (name_uz, name_ru) VALUES ('Stonehenge Apocalypse', 'Now and Then');
+INSERT INTO events (name_uz, name_ru) VALUES ('Boomerang', 'Fetishes');
+INSERT INTO events (name_uz, name_ru) VALUES ('Life Less Ordinary, A', 'Kids in the Hall: Brain Candy');
+INSERT INTO events (name_uz, name_ru) VALUES ('Iron Eagle II', 'À nos amours');
+INSERT INTO events (name_uz, name_ru) VALUES ('Dumplings (Gaau ji)', 'Party Monster');
+INSERT INTO events (name_uz, name_ru) VALUES ('Save Me', 'Crow: City of Angels, The');
+INSERT INTO events (name_uz, name_ru) VALUES ('Pool Without Water, A (Mizu no nai puuru)', 'In Bruges');
+INSERT INTO events (name_uz, name_ru) VALUES ('The Big Sleep', 'Cinderella II: Dreams Come True');
+INSERT INTO events (name_uz, name_ru) VALUES ('Land Ho!', 'Venus');
+INSERT INTO events (name_uz, name_ru) VALUES ('Bundle of Joy', 'Badlands');
+INSERT INTO events (name_uz, name_ru) VALUES ('Skyscraper (Skyskraber)', 'American Idiots');
+INSERT INTO events (name_uz, name_ru) VALUES ('Truth or Consequences, N.M.', 'World according to Ion B., The (Lumea vazuta de Ion B)');
+INSERT INTO events (name_uz, name_ru) VALUES ('Little Miss Broadway', 'Manon');
+INSERT INTO events (name_uz, name_ru) VALUES ('Story of Esther Costello, The', 'Silver Bullet (Stephen King''s Silver Bullet)');
+INSERT INTO events (name_uz, name_ru) VALUES ('She No Longer Talks, She Shoots', 'Dr Money and the Boy with No Penis');
+INSERT INTO events (name_uz, name_ru) VALUES ('Tangled Ever After', 'White Men Can''t Jump');
+INSERT INTO events (name_uz, name_ru) VALUES ('Human Resources Manager, The', 'Learning to Ride');
+INSERT INTO events (name_uz, name_ru) VALUES ('Get Carter', 'Lost Battalion, The');
+INSERT INTO events (name_uz, name_ru) VALUES ('Tour De Force (Hin und weg)', 'Why Are the Bells Ringing, Mitica? (a.k.a. Carnival Scenes) (De ce trag clopotele, Mitica?)');
+INSERT INTO events (name_uz, name_ru) VALUES ('Happy We (Två killar och en tjej)', 'Deuces Wild');
+INSERT INTO events (name_uz, name_ru) VALUES ('Office Killer', 'Miss Sadie Thompson');
+INSERT INTO events (name_uz, name_ru) VALUES ('Woman of the Year', 'My Führer');
+INSERT INTO events (name_uz, name_ru) VALUES ('Thy Womb (Sinapupunan)', 'From the Orient with Fury');
+INSERT INTO events (name_uz, name_ru) VALUES ('Eight Men Out', 'Dreamland');
+INSERT INTO events (name_uz, name_ru) VALUES ('Aashiqui 2', 'Scaramouche');
+INSERT INTO events (name_uz, name_ru) VALUES ('Superbad', 'Earth Trembles, The (Terra trema: Episodio del mare, La)');
+INSERT INTO events (name_uz, name_ru) VALUES ('Garfield''s Fun Fest', 'It! The Terror from Beyond Space');
+INSERT INTO events (name_uz, name_ru) VALUES ('She Hate Me', 'What Have You Done to Solange?');
+INSERT INTO events (name_uz, name_ru) VALUES ('Border Run (Mule, The)', 'Die Hard 2');
+
+-- migrate:down
+
+DELETE FROM events;
