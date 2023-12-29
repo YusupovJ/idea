@@ -57,12 +57,8 @@ const getAll = async (req, res) => {
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const getCategoriesQuery =
-			"SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?";
-		const [categories] = await db.query(getCategoriesQuery, [
-			pagination.limit,
-			pagination.offset,
-		]);
+		const getCategoriesQuery = "SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?";
+		const [categories] = await db.query(getCategoriesQuery, [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(categories, pagination);
 	} catch (error) {

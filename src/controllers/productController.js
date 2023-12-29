@@ -41,10 +41,7 @@ const addEvents = async (events, products_id) => {
 
 const addAttributeValues = async (attributeValues, products_id) => {
 	for (const attributeValueId of attributeValues) {
-		const [[event]] = await db.query(
-			"SELECT * FROM attribute_values WHERE id = ?",
-			attributeValueId
-		);
+		const [[event]] = await db.query("SELECT * FROM attribute_values WHERE id = ?", attributeValueId);
 
 		if (!event) {
 			throw new BadRequest(`There are no attributes with ${attributeValueId} id`);
@@ -106,10 +103,7 @@ const getAll = async (req, res) => {
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const [products] = await db.query("SELECT * FROM products LIMIT ? OFFSET ?", [
-			pagination.limit,
-			pagination.offset,
-		]);
+		const [products] = await db.query("SELECT * FROM products LIMIT ? OFFSET ?", [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(products, pagination);
 	} catch (error) {

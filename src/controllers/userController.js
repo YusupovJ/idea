@@ -11,10 +11,7 @@ const getAll = async (req, res) => {
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const [users] = await db.query("SELECT * FROM users LIMIT ? OFFSET ?", [
-			pagination.limit,
-			pagination.offset,
-		]);
+		const [users] = await db.query("SELECT * FROM users LIMIT ? OFFSET ?", [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(users, pagination);
 	} catch (error) {

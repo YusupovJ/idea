@@ -6,12 +6,7 @@ import { getAllUserValidator, updateUserValidator } from "../validators/userVali
 const userRoute = Router();
 
 userRoute.get("/", ...roleGuard("moderator"), ...getAllUserValidator, userController.getAll);
-userRoute.patch(
-	"/:id",
-	...roleGuard("moderator", "user"),
-	...updateUserValidator,
-	userController.update
-);
+userRoute.patch("/:id", ...roleGuard("moderator", "user"), ...updateUserValidator, userController.update);
 userRoute.delete("/:id", ...roleGuard("moderator", "user"), userController.remove);
 
 export default userRoute;
