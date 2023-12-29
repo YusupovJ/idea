@@ -7,23 +7,23 @@ import token from "../helpers/generateTokens.js";
     Get id and role from decodedToken and put it in req.
 */
 const authGuard = (req, res, next) => {
-	try {
-		const accessToken = req.headers.authorization?.split(" ")[1];
+    try {
+        const accessToken = req.headers.authorization?.split(" ")[1];
 
-		if (!accessToken) {
-			throw new Unauthorized("You must be authorized");
-		}
+        if (!accessToken) {
+            throw new Unauthorized("You must be authorized");
+        }
 
-		const decodedToken = token.verifyAccessToken(accessToken);
-		const { id, role } = decodedToken;
+        const decodedToken = token.verifyAccessToken(accessToken);
+        const { id, role } = decodedToken;
 
-		req.id = id;
-		req.role = role;
+        req.id = id;
+        req.role = role;
 
-		next();
-	} catch (error) {
-		apiResponse(res).throw(error);
-	}
+        next();
+    } catch (error) {
+        apiResponse(res).throw(error);
+    }
 };
 
 export default authGuard;
