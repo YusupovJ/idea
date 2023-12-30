@@ -1,3 +1,5 @@
+import { param } from "express-validator";
+
 export const paginationQuery = (input) => {
 	// is numeric value
 	if (isNaN(+input)) return false;
@@ -13,3 +15,5 @@ export const isUzMobilePhone = (input) => {
 	const regexp = /\+998(90|91|93|94|50|55|88|97|98|95|99|33)[0-9]{7}$/;
 	return regexp.test(input);
 };
+
+export const isId = param("id").isInt({ min: 1 });

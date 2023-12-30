@@ -2,13 +2,14 @@ import { add, getAll, getOne, remove, update } from "../controllers/productContr
 import roleGuard from "../middlewares/roleGuard.js";
 import { Router } from "express";
 import { addProductValidator, updateProductValidator, getAllProductsValidator } from "../validators/productsValidator.js";
+import { isId } from "../validators/customValidators.js";
 
 const productRoute = Router();
 
 productRoute.post("/", ...roleGuard("moderator"), ...addProductValidator, add);
-productRoute.get("/", getAll);
-productRoute.get("/:id", getOne);
-productRoute.patch("/:id", ...roleGuard("moderator"), ...getAllProductsValidator, ...updateProductValidator, update);
-productRoute.delete("/:id", ...roleGuard("moderator"), remove);
+productRoute.get("/", ...getAllProductsValidator, getAll);
+productRoute.get("/:id", isId, getOne);
+productRoute.patch("/:id", ...roleGuard("moderator"), isId, ...updateProductValidator, update);
+productRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
 
 export default productRoute;

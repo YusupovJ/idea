@@ -4,6 +4,7 @@ import authRoute from "./routes/authRoute.js";
 import productRoute from "./routes/productRoute.js";
 import userRoute from "./routes/userRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
+import eventRoute from "./routes/eventRoute.js";
 
 const app = express();
 const port = env.PORT;
@@ -13,6 +14,7 @@ app.use("/auth", authRoute);
 app.use("/products", productRoute);
 app.use("/users", userRoute);
 app.use("/categories", categoryRoute);
+app.use("/events", eventRoute);
 
 app.listen(port, (error) => {
 	if (error) {

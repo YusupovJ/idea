@@ -9,7 +9,7 @@ export const addProductValidator = [
 	body("desc_short_uz").notEmpty().withMessage("Uzb short description must be provided"),
 	body("desc_short_ru").notEmpty().withMessage("Ru short description must be provided"),
 	body("count").notEmpty().isInt({ min: 1 }).withMessage("Count must be at least 1"),
-	body("images").optional().isURL(),
+	body("images").optional().isArray().withMessage("You must send an array of images"),
 	body("price").notEmpty().isInt({ min: 1000 }).withMessage("It is too cheap"),
 	body("discount").optional().isFloat({ min: 5, max: 100 }).withMessage("Discount must be between 5% and 100%"),
 	body("categories").optional().isArray().withMessage("categories field must be an array of ids"),
