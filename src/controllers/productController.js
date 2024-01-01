@@ -3,6 +3,7 @@ import db from "../config/db.config.js";
 import Pagination from "../helpers/pagination.js";
 import { BadRequest, NotFound } from "../helpers/errors.js";
 import checkValidation from "../helpers/checkValidation.js";
+import Token from "../helpers/generateTokens.js";
 
 /* 
     addCategories, addEvents, addAttributeValues are functions for
@@ -162,8 +163,20 @@ export const getOne = async (req, res) => {
 
 		product.views += 1;
 		product.attributeValues = attributeValues;
+		product.isFav = false;
 
 		await db.query("UPDATE products SET views = ? WHERE id = ?", [product.views, id]);
+
+		const token = req.headers?.authorization?.split(" ")[1];
+
+		if (token) {
+			const { id: userId } = Token.verifyAccessToken(token);
+
+			const getQuery = "SELECT * FROM users_products WHERE products_id = ? AND users_id = ?";
+			const [[isFav]] = await db.query(getQuery, [id, userId]);
+
+			product.isFav = Boolean(isFav);
+		}
 
 		apiResponse(res).send(product);
 	} catch (error) {
