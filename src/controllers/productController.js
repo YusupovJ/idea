@@ -154,16 +154,20 @@ export const getOne = async (req, res) => {
 		const { id } = req.params;
 		const [[product]] = await db.query("SELECT * FROM products WHERE id = ?", id);
 
-		const sqlQuery = `
+		const getAttrQuery = `
             SELECT a.id, a.name_uz, a.name_ru, av.value_uz, av.value_ru 
             FROM attribute_values_products AS avp
             JOIN attribute_values AS av ON av.id = avp.attribute_values_id 
             JOIN attributes AS a ON a.id = av.attribute_id
             WHERE avp.products_id = ?;
         `;
-		const [attributeValues] = await db.query(sqlQuery, id);
+
+		const [attributeValues] = await db.query(getAttrQuery, id);
+		const getRatingQuery = "SELECT AVG(rating) FROM reviews WHERE product_id = ?";
+		const [[{ "AVG(rating)": rating }]] = await db.query(getRatingQuery, id);
 
 		product.views += 1;
+		product.rating = rating || 0;
 		product.attributeValues = attributeValues;
 		product.isFav = false;
 
