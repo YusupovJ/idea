@@ -32,39 +32,37 @@ export const add = async (req, res) => {
 
 export const getAll = async (req, res) => {
 	try {
-		try {
-			const { page, limit } = req.query;
-			const [[{ "COUNT(*)": totalItems }]] = await db.query("SELECT COUNT(*) FROM users_products WHERE users_id = ?", req.id);
-			const pagination = new Pagination(totalItems, page, limit);
+		checkValidation(req);
 
-			const sqlQuery = `
+		const { page, limit } = req.query;
+		const [[{ "COUNT(*)": totalItems }]] = await db.query("SELECT COUNT(*) FROM users_products WHERE users_id = ?", req.id);
+		const pagination = new Pagination(totalItems, page, limit);
+
+		const sqlQuery = `
                 SELECT * FROM users_products AS up
                 JOIN products AS p
                 ON p.id = up.products_id
                 WHERE up.users_id = ?
                 LIMIT ? OFFSET ? 
             `;
-			const [result] = await db.query(sqlQuery, [req.id, pagination.limit, pagination.offset]);
+		const [result] = await db.query(sqlQuery, [req.id, pagination.limit, pagination.offset]);
 
-			// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
-			const favourites = result.map((favourite) => {
-				if (favourite.images) {
-					delete favourite.products_id;
-					delete favourite.users_id;
+		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
+		const favourites = result.map((favourite) => {
+			if (favourite.images) {
+				delete favourite.products_id;
+				delete favourite.users_id;
 
-					return {
-						...favourite,
-						images: favourite.images.split(","),
-					};
-				}
+				return {
+					...favourite,
+					images: favourite.images.split(","),
+				};
+			}
 
-				return [];
-			});
+			return [];
+		});
 
-			apiResponse(res).send(favourites, pagination);
-		} catch (error) {
-			apiResponse(res).throw(error);
-		}
+		apiResponse(res).send(favourites, pagination);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -72,6 +70,8 @@ export const getAll = async (req, res) => {
 
 export const remove = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { id: productId } = req.params;
 		const { id: userId } = req;
 

@@ -17,7 +17,10 @@ export const addProductValidator = [
 	body("attributeValues").optional().isArray().withMessage("attributeValues field must be an array of ids"),
 ];
 
-export const getAllProductsValidator = [query("page").optional().custom(paginationQuery), query("limit").optional().custom(paginationQuery)];
+export const getAllProductsValidator = [
+	query("page").optional().custom(paginationQuery).withMessage("page must be an integer and no less than 1"),
+	query("limit").optional().custom(paginationQuery).withMessage("limit must be an integer and no less than 1"),
+];
 
 export const updateProductValidator = [
 	body("name_uz").optional().isLength({ min: 1 }).withMessage("Uzb name must be provided"),

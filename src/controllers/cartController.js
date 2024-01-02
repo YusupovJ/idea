@@ -1,7 +1,7 @@
 import apiResponse from "../helpers/apiResponse.js";
 import checkValidation from "../helpers/checkValidation.js";
 import db from "../config/db.config.js";
-import { BadRequest, NotFound } from "../helpers/errors.js";
+import { NotFound } from "../helpers/errors.js";
 import Pagination from "../helpers/pagination.js";
 
 export const add = async (req, res) => {
@@ -36,8 +36,8 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const getTotalItemsQuery = "SELECT COUNT(id) FROM cart";
-		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery);
+		const getTotalItemsQuery = "SELECT COUNT(id) FROM cart WHERE user_id = ?";
+		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery, req.id);
 
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
@@ -48,9 +48,10 @@ export const getAll = async (req, res) => {
             p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
             p.created_at, p.updated_at FROM cart AS c
             JOIN products AS p
-            ON p.id = c.product_id;
+            ON p.id = c.product_id
+            WHERE user_id = ?
         `;
-		const [result] = await db.query(getQuery, [pagination.limit, pagination.offset]);
+		const [result] = await db.query(getQuery, [pagination.limit, pagination.offset, req.id]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
 		const carts = result.map((cart) => {
@@ -75,8 +76,8 @@ export const remove = async (req, res) => {
 		checkValidation(req);
 
 		const { id } = req.params;
-		const getQuery = "SELECT * FROM cart WHERE id = ?";
-		const [[cart]] = await db.query(getQuery, id);
+		const getQuery = "SELECT * FROM cart WHERE id = ? AND user_id = ?";
+		const [[cart]] = await db.query(getQuery, [id, req.id]);
 
 		if (!cart) {
 			throw new NotFound("This product does not exist in your cart");

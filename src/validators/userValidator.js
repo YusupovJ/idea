@@ -8,4 +8,7 @@ export const updateUserValidator = [
 	body("phone").optional().custom(isUzMobilePhone).withMessage("Phone is incorrect"),
 ];
 
-export const getAllUserValidator = [query("page").optional().custom(paginationQuery), query("limit").optional().custom(paginationQuery)];
+export const getAllUserValidator = [
+	query("page").optional().custom(paginationQuery).withMessage("page must be an integer and no less than 1"),
+	query("limit").optional().custom(paginationQuery).withMessage("limit must be an integer and no less than 1"),
+];

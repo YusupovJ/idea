@@ -2,6 +2,7 @@ import apiResponse from "../helpers/apiResponse.js";
 import db from "../config/db.config.js";
 import Pagination from "../helpers/pagination.js";
 import { BadRequest, NotFound } from "../helpers/errors.js";
+import checkValidation from "../helpers/checkValidation.js";
 
 /* 
     if there are attributes, we put them into 
@@ -24,6 +25,8 @@ const addAttributes = async (attributes, products_id) => {
 
 export const add = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { body } = req;
 		const newCategory = {
 			name_uz: body.name_uz,
@@ -51,6 +54,8 @@ export const add = async (req, res) => {
 
 export const getAll = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const getCountQuery = "SELECT COUNT(id) FROM categories WHERE parent_id IS NULL";
 		const [[{ "COUNT(id)": totalItems }]] = await db.query(getCountQuery);
 
@@ -68,6 +73,8 @@ export const getAll = async (req, res) => {
 
 export const update = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { id } = req.params;
 		const [[category]] = await db.query("SELECT * FROM categories WHERE id = ?", id);
 
@@ -94,6 +101,8 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { id } = req.params;
 		const [[category]] = await db.query("SELECT * FROM categories WHERE id = ?", id);
 

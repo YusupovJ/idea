@@ -37,6 +37,8 @@ export const getAll = async (req, res) => {
 
 export const update = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { id } = req.params;
 		const [[event]] = await db.query("SELECT * FROM events WHERE id = ?", id);
 
@@ -59,6 +61,8 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
 	try {
+		checkValidation(req);
+
 		const { id } = req.params;
 		const [[event]] = await db.query("SELECT * FROM events WHERE id = ?", id);
 
