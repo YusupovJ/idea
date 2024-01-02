@@ -24,7 +24,7 @@ export const add = async (req, res) => {
 export const getAll = async (req, res) => {
 	try {
 		const { page, limit } = req.query;
-		const [[{ "COUNT(id)": totalItems }]] = await db.query("SELECT id FROM events");
+		const [[{ "COUNT(id)": totalItems }]] = await db.query("SELECT COUNT(id) FROM events");
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const [events] = await db.query("SELECT * FROM events LIMIT ? OFFSET ?", [pagination.limit, pagination.offset]);

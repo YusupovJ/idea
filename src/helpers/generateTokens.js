@@ -10,7 +10,7 @@ const refreshTokenSecret = env.REFRESH_TOKEN_SECRET;
 
 class Token {
 	generateAccessToken(id, role) {
-		const accessToken = jwt.sign({ id, role }, accessTokenSecret, { expiresIn: "15m" });
+		const accessToken = jwt.sign({ id, role }, accessTokenSecret, { expiresIn: "30m" });
 		return accessToken;
 	}
 
