@@ -95,7 +95,6 @@ export const remove = async (req, res) => {
 
 		apiResponse(res).send("Product was successfully removed from favourites");
 	} catch (error) {
-		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };

@@ -71,34 +71,14 @@ export const getAll = async (req, res) => {
 	}
 };
 
-export const remove = async (req, res) => {
-	try {
-		checkValidation(req);
-
-		const { id } = req.params;
-		const getQuery = "SELECT * FROM cart WHERE id = ? AND user_id = ?";
-		const [[cart]] = await db.query(getQuery, [id, req.id]);
-
-		if (!cart) {
-			throw new NotFound("This product does not exist in your cart");
-		}
-
-		const delQuery = "DELETE FROM cart WHERE id = ?";
-		await db.query(delQuery, id);
-
-		apiResponse(res).send("Product was successfully removed from your cart");
-	} catch (error) {
-		apiResponse(res).throw(error);
-	}
-};
-
 export const update = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { id } = req.params;
-		const getQuery = "SELECT * FROM cart WHERE id = ?";
-		const [[cart]] = await db.query(getQuery, id);
+		const { id: userId } = req;
+		const { id: cartId } = req.params;
+		const getQuery = "SELECT * FROM cart WHERE id = ? AND user_id = ?";
+		const [[cart]] = await db.query(getQuery, [cartId, userId]);
 
 		if (!cart) {
 			throw new NotFound("This product does not exist in your cart");
@@ -107,9 +87,31 @@ export const update = async (req, res) => {
 		const updatedCart = req.body;
 
 		const updateQuery = "UPDATE cart SET ? WHERE id = ?";
-		await db.query(updateQuery, [updatedCart, id]);
+		await db.query(updateQuery, [updatedCart, cartId]);
 
 		apiResponse(res).send("Product was successfully updated");
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
+};
+
+export const remove = async (req, res) => {
+	try {
+		checkValidation(req);
+
+		const { id: userId } = req;
+		const { id: cartId } = req.params;
+		const getQuery = "SELECT * FROM cart WHERE id = ? AND user_id = ?";
+		const [[cart]] = await db.query(getQuery, [cartId, userId]);
+
+		if (!cart) {
+			throw new NotFound("This product does not exist in your cart");
+		}
+
+		const delQuery = "DELETE FROM cart WHERE id = ?";
+		await db.query(delQuery, cartId);
+
+		apiResponse(res).send("Product was successfully removed from your cart");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
