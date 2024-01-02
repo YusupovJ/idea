@@ -16,4 +16,4 @@ export const isUzMobilePhone = (input) => {
 	return regexp.test(input);
 };
 
-export const isId = param("id").isInt({ min: 1 });
+export const isId = param("id").isInt({ min: 1 }).withMessage("Param id must be an id");

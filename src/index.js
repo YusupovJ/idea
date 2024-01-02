@@ -6,6 +6,7 @@ import userRoute from "./routes/userRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import eventRoute from "./routes/eventRoute.js";
 import favouriteRoute from "./routes/favouriteRoute.js";
+import cartRoute from "./routes/cartRoute.js";
 
 const app = express();
 const port = env.PORT;
@@ -17,6 +18,7 @@ app.use("/users", userRoute);
 app.use("/categories", categoryRoute);
 app.use("/events", eventRoute);
 app.use("/favourites", favouriteRoute);
+app.use("/cart", cartRoute);
 
 app.listen(port, () => {
 	try {
