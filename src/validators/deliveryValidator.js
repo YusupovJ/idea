@@ -1,4 +1,5 @@
 import { body, query } from "express-validator";
+import { paginationQuery } from "./customValidators.js";
 
 export const addDeliveryValidator = [
 	body("addressId").notEmpty().isInt({ min: 1 }).withMessage("addressId must be id"),
