@@ -42,12 +42,32 @@ export const getAll = async (req, res) => {
 		const { page, limit } = req.query;
 		const { id: productId } = req.params;
 
-		const getTotalItemsQuery = "SELECT COUNT(id) FROM reviews WHERE product_id = ?";
+		const getTotalItemsQuery = `
+            SELECT COUNT(r.id)
+            FROM reviews AS r
+            JOIN reviews AS ra
+            ON ra.answer_to = r.id            
+            WHERE r.product_id = ?            
+            AND r.answer_to IS NULL
+        `;
 		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery, productId);
 
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const getQuery = "SELECT * FROM reviews WHERE product_id = ? LIMIT ? OFFSET ?";
+		const getQuery = `
+            SELECT 
+            r.id AS review_id, ra.id AS answer_id, r.text AS review_text, 
+            ra.text AS answer_text, r.rating, r.image AS review_image,
+            ra.image AS answer_image, r.created_at AS review_created_at, 
+            r.updated_at AS review_updated_at, ra.created_at AS answer_created_at, 
+            ra.updated_at AS answer_updated_at
+            FROM reviews AS r
+            JOIN reviews AS ra
+            ON ra.answer_to = r.id            
+            WHERE r.product_id = ?        
+            AND r.answer_to IS NULL
+            LIMIT ? OFFSET ?
+        `;
 		const [reviews] = await db.query(getQuery, [productId, pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(reviews, pagination);
