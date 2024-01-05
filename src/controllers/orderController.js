@@ -8,21 +8,21 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { productId, count } = req.body;
-		const { id: userId } = req;
+		const { product_id, count } = req.body;
+		const { id: user_id } = req;
 
 		const getQuery = "SELECT * FROM products WHERE id = ?";
-		const [[product]] = await db.query(getQuery, productId);
+		const [[product]] = await db.query(getQuery, product_id);
 
 		if (!product) {
-			throw new NotFound("Product does not exist");
+			throw new NotFound("Product not found");
 		}
 
 		const newOrder = {
-			product_id: productId,
+			product_id,
 			count,
 			status: null,
-			user_id: userId,
+			user_id,
 			delivery_id: null,
 		};
 
@@ -32,7 +32,7 @@ export const add = async (req, res) => {
 		const updateOrdersQuery = "UPDATE products SET orders = orders + 1, count = ? WHERE id = ?";
 		await db.query(updateOrdersQuery, [product.count - count, productId]);
 
-		apiResponse(res).send("You successfully ordered this product", null, 201);
+		apiResponse(res).send("Order created", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -100,7 +100,7 @@ export const update = async (req, res) => {
 		const updateQuery = "UPDATE orders SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedOrder, orderId]);
 
-		apiResponse(res).send("Order updated");
+		apiResponse(res).send("Order updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

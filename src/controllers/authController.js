@@ -7,124 +7,130 @@ import checkValidation from "../helpers/checkValidation.js";
 
 /* Update refresh token */
 const updateUserRefreshToken = (newRefreshToken, userId) => {
-    const hashedRefreshToken = crypt.hash(newRefreshToken);
-    const updateQuery = "UPDATE users SET refresh_token = ? WHERE id = ?";
+	const hashedRefreshToken = crypt.hash(newRefreshToken);
+	const updateQuery = "UPDATE users SET refresh_token = ? WHERE id = ?";
 
-    db.query(updateQuery, [hashedRefreshToken, userId]);
+	db.query(updateQuery, [hashedRefreshToken, userId]);
 };
 
 export const register = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { email, password, phone, name } = req.body;
-        const selectQuery = "SELECT * FROM users WHERE email = ?";
-        const [[user]] = await db.query(selectQuery, email);
+		const { email, password, phone, name } = req.body;
+		const getQuery = "SELECT * FROM users WHERE email = ?";
+		const [[user]] = await db.query(getQuery, email);
 
-        if (user) {
-            throw new BadRequest("User already exists");
-        }
+		if (user) {
+			throw new BadRequest("User already exists");
+		}
 
-        const hashedPassword = crypt.hash(password);
-        const newUser = {
-            email,
-            password: hashedPassword,
-            phone,
-            name,
-            role: "user",
-        };
+		const hashedPassword = crypt.hash(password);
+		const newUser = {
+			email,
+			password: hashedPassword,
+			phone,
+			name,
+			role: "user",
+		};
 
-        const [createdUser] = await db.query("INSERT INTO users SET ?", newUser);
+		const addQuery = "INSERT INTO users SET ?";
+		const [addedUser] = await db.query(addQuery, newUser);
 
-        const accessToken = token.generateAccessToken(createdUser.insertId, "user");
-        const refreshToken = token.generateRefreshToken(createdUser.insertId, "user");
+		const accessToken = token.generateAccessToken(addedUser.insertId, "user");
+		const refreshToken = token.generateRefreshToken(addedUser.insertId, "user");
 
-        apiResponse(res).send({ accessToken, refreshToken }, null, 201);
+		apiResponse(res).send({ accessToken, refreshToken }, null, 201);
 
-        updateUserRefreshToken(refreshToken, createdUser.insertId);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		updateUserRefreshToken(refreshToken, addedUser.insertId);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const login = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { email, password } = req.body;
-        const selectQuery = "SELECT * FROM users WHERE email = ?";
-        const [[user]] = await db.query(selectQuery, email);
+		const { email, password } = req.body;
+		const getQuery = "SELECT * FROM users WHERE email = ?";
+		const [[user]] = await db.query(getQuery, email);
 
-        if (!user) {
-            throw new BadRequest("Password or email are incorrect");
-        }
+		if (!user) {
+			throw new BadRequest("Password or email are incorrect");
+		}
 
-        const isRightPassword = crypt.compare(password, user.password);
+		const isRightPassword = crypt.compare(password, user.password);
 
-        if (!isRightPassword) {
-            throw new BadRequest("Password or email are incorrect");
-        }
+		if (!isRightPassword) {
+			throw new BadRequest("Password or email are incorrect");
+		}
 
-        const accessToken = token.generateAccessToken(user.id, user.role);
-        const refreshToken = token.generateRefreshToken(user.id, user.role);
+		const accessToken = token.generateAccessToken(user.id, user.role);
+		const refreshToken = token.generateRefreshToken(user.id, user.role);
 
-        apiResponse(res).send({ accessToken, refreshToken });
+		apiResponse(res).send({ accessToken, refreshToken });
 
-        updateUserRefreshToken(refreshToken, user.id);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		updateUserRefreshToken(refreshToken, user.id);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const refresh = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { refreshToken } = req.body;
-        const decodedToken = token.verifyRefreshToken(refreshToken);
+		const { refresh_token } = req.body;
+		const decodedToken = token.verifyRefreshToken(refresh_token);
 
-        const { id, role } = decodedToken;
-        const selectQuery = "SELECT * FROM users WHERE id = ?";
-        const [[user]] = await db.query(selectQuery, id);
+		const { id, role } = decodedToken;
+		const getQuery = "SELECT * FROM users WHERE id = ?";
+		const [[user]] = await db.query(getQuery, id);
 
-        const isTokenRight = crypt.compare(refreshToken, user.refresh_token);
+		const isTokenRight = crypt.compare(refreshToken, user.refresh_token);
 
-        if (!isTokenRight) {
-            throw new BadRequest("Your token is not valid");
-        }
+		if (!isTokenRight) {
+			throw new BadRequest("Your token is not valid");
+		}
 
-        const newAccessToken = token.generateAccessToken(id, role);
-        const newRefreshToken = token.generateRefreshToken(id, role);
+		const newAccessToken = token.generateAccessToken(id, role);
+		const newRefreshToken = token.generateRefreshToken(id, role);
 
-        apiResponse(res).send({
-            refreshToken: newRefreshToken,
-            accessToken: newAccessToken,
-        });
+		apiResponse(res).send({
+			refreshToken: newRefreshToken,
+			accessToken: newAccessToken,
+		});
 
-        updateUserRefreshToken(newRefreshToken, id);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		updateUserRefreshToken(newRefreshToken, id);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const logout = async (req, res) => {
-    try {
-        const updateQuery = "UPDATE users SET refresh_token = NULL WHERE id = ?";
-        await db.query(updateQuery, req.id);
+	try {
+		const updateQuery = "UPDATE users SET refresh_token = NULL WHERE id = ?";
+		await db.query(updateQuery, req.id);
 
-        apiResponse(res).send("You successfully logged out your account");
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		apiResponse(res).send("You successfully logged out your account");
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const me = async (req, res) => {
-    try {
-        const { id } = req;
-        const [[user]] = await db.query("SELECT id, name, email, phone, role, created_at, updated_at FROM users WHERE id = ?", id);
+	try {
+		const { id } = req;
+		const getQuery = `
+            SELECT id, name, email, phone, role, created_at, updated_at 
+            FROM users 
+            WHERE id = ?
+        `;
+		const [[user]] = await db.query(getQuery, id);
 
-        apiResponse(res).send(user);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		apiResponse(res).send(user);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };

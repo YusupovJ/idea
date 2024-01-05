@@ -58,7 +58,7 @@ export const update = async (req, res) => {
 		const updateQuery = "UPDATE attributes SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedAttribute, id]);
 
-		apiResponse(res).send("Attribute updated");
+		apiResponse(res).send("Attribute updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -80,7 +80,7 @@ export const remove = async (req, res) => {
 		const delQuery = "DELETE FROM attributes WHERE id = ?";
 		await db.query(delQuery, id);
 
-		apiResponse(res).send("Attribute deleted");
+		apiResponse(res).send("Attribute removed");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

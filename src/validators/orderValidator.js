@@ -2,7 +2,7 @@ import { body, query } from "express-validator";
 import { paginationQuery } from "./customValidators.js";
 
 export const addOrderValidator = [
-	body("productId").notEmpty().isInt({ min: 1 }).withMessage("productId must be id"),
+	body("product_id").notEmpty().isInt({ min: 1 }).withMessage("product_id must be id"),
 	body("count").notEmpty().isInt({ min: 1 }).withMessage("count must be an integer"),
 ];
 
@@ -16,5 +16,5 @@ const statusValidator = (input) => input === "packing" || input === "on_the_way"
 export const updateOrderValidator = [
 	body("count").optional().isInt({ min: 1 }).withMessage("count must be an integer"),
 	body("status").optional().custom(statusValidator).withMessage("status can be 'packing', 'on_the_way' and 'finished'"),
-	body("deliveryId").optional().isInt({ min: 1 }).withMessage("deliveryId must be id"),
+	body("delivery_id").optional().isInt({ min: 1 }).withMessage("delivery_id must be id"),
 ];

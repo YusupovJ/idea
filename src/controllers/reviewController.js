@@ -8,28 +8,29 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { productId, text, image, rating, answerTo } = req.body;
+		const { product_id, text, image, rating, answer_to } = req.body;
 		const { id: userId } = req;
 
 		const getProductQuery = "SELECT * FROM products WHERE id = ?";
-		const [[product]] = await db.query(getProductQuery, productId);
+		const [[product]] = await db.query(getProductQuery, product_id);
 
 		if (!product) {
-			throw new NotFound("Product does not exist");
+			throw new NotFound("Product not found");
 		}
 
 		const newReview = {
-			product_id: productId,
+			product_id,
 			text,
 			image,
 			rating,
-			answer_to: answerTo || null,
+			answer_to: answer_to || null,
 			user_id: userId,
 		};
 
-		await db.query("INSERT INTO reviews SET ?", newReview);
+		const addQuery = "INSERT INTO reviews SET ?";
+		await db.query(addQuery, newReview);
 
-		apiResponse(res).send("You successfully wrote a review", null, 201);
+		apiResponse(res).send("Review created", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -83,6 +84,7 @@ export const update = async (req, res) => {
 
 		const { id: userId, role } = req;
 		const { id: reviewId } = req.params;
+
 		const updatedReview = { ...req.body, updated_at: new Date() };
 
 		if (role === "moderator" || role === "admin") {
@@ -90,7 +92,7 @@ export const update = async (req, res) => {
 			const [[review]] = await db.query(getQuery, reviewId);
 
 			if (!review) {
-				throw new NotFound("Review does not exist");
+				throw new NotFound("Review not found");
 			}
 
 			const updateQuery = "UPDATE reviews SET ? WHERE id = ?";
@@ -100,14 +102,14 @@ export const update = async (req, res) => {
 			const [[review]] = await db.query(getQuery, [reviewId, userId]);
 
 			if (!review) {
-				throw new NotFound("Review does not exist");
+				throw new NotFound("Review not found");
 			}
 
 			const updateQuery = "UPDATE reviews SET ? WHERE id = ? AND user_id = ?";
 			await db.query(updateQuery, [updatedReview, reviewId, userId]);
 		}
 
-		apiResponse(res).send("Review updated successfully", null, 201);
+		apiResponse(res).send("Review updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -142,7 +144,7 @@ export const remove = async (req, res) => {
 			await db.query(delQuery, [reviewId, userId]);
 		}
 
-		apiResponse(res).send("Review removed successfully");
+		apiResponse(res).send("Review removed");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

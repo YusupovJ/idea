@@ -1,7 +1,7 @@
 import apiResponse from "../helpers/apiResponse.js";
 import checkValidation from "../helpers/checkValidation.js";
 import db from "../config/db.config.js";
-import { NotFound, BadRequest } from "../helpers/errors.js";
+import { NotFound } from "../helpers/errors.js";
 import Pagination from "../helpers/pagination.js";
 
 export const add = async (req, res) => {
@@ -62,7 +62,7 @@ export const update = async (req, res) => {
 		const updateQuery = "UPDATE attribute_values SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedValue, id]);
 
-		apiResponse(res).send("Attribute value updated");
+		apiResponse(res).send("Attribute value updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

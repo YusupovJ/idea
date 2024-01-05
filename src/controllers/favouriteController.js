@@ -8,23 +8,22 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { productId } = req.body;
-		const { id: userId } = req;
+		const { product_id } = req.body;
+		const { id: users_id } = req;
 
-		const [[favourite]] = await db.query("SELECT * FROM users_products WHERE products_id = ?", productId);
+		const getQuery = "SELECT * FROM users_products WHERE products_id = ?";
+		const [[favourite]] = await db.query(getQuery, product_id);
 
 		if (favourite) {
 			throw new BadRequest("You've already added this product to favourites");
 		}
 
-		const newFavourite = {
-			products_id: productId,
-			users_id: userId,
-		};
+		const newFavourite = { products_id, users_id };
 
-		await db.query("INSERT INTO users_products SET ?", newFavourite);
+		const addQuery = "INSERT INTO users_products SET ?";
+		await db.query(addQuery, newFavourite);
 
-		apiResponse(res).send("You successfully added product to favourites");
+		apiResponse(res).send("Added to favourite", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -34,18 +33,22 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
+		const { id: userId } = req;
+
+		const getTotalItemsQuery = "SELECT COUNT(*) FROM users_products WHERE users_id = ?";
+		const [[{ "COUNT(*)": totalItems }]] = await db.query(getTotalItemsQuery, userId);
+
 		const { page, limit } = req.query;
-		const [[{ "COUNT(*)": totalItems }]] = await db.query("SELECT COUNT(*) FROM users_products WHERE users_id = ?", req.id);
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const sqlQuery = `
-                SELECT * FROM users_products AS up
-                JOIN products AS p
-                ON p.id = up.products_id
-                WHERE up.users_id = ?
-                LIMIT ? OFFSET ? 
-            `;
-		const [result] = await db.query(sqlQuery, [req.id, pagination.limit, pagination.offset]);
+		const getQuery = `
+            SELECT * FROM users_products AS up
+            JOIN products AS p
+            ON p.id = up.products_id
+            WHERE up.users_id = ?
+            LIMIT ? OFFSET ? 
+        `;
+		const [result] = await db.query(getQuery, [userId, pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
 		const favourites = result.map((favourite) => {
@@ -83,7 +86,7 @@ export const remove = async (req, res) => {
 		const [[favourite]] = await db.query(getQuery, [productId, userId]);
 
 		if (!favourite) {
-			throw new NotFound("This favourite product does not exist");
+			throw new NotFound("Favourite not found");
 		}
 
 		const delQuery = `
@@ -93,7 +96,7 @@ export const remove = async (req, res) => {
         `;
 		await db.query(delQuery, [productId, userId]);
 
-		apiResponse(res).send("Product was successfully removed from favourites");
+		apiResponse(res).send("Product removed from favourites");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

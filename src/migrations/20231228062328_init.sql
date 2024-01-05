@@ -37,7 +37,7 @@ CREATE TABLE `categories` (
   `desc_uz` text,
   `desc_ru` text,
   `views` integer DEFAULT 0,
-  `images` varchar(255),
+  `image` varchar(255),
   `parent_id` integer,
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW()

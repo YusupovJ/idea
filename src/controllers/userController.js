@@ -8,12 +8,14 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const [[{ "COUNT(id)": totalItems }]] = await db.query("SELECT COUNT(id) FROM users");
+		const getTotalItemsQuery = "SELECT COUNT(id) FROM users";
+		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery);
 
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const [users] = await db.query("SELECT * FROM users LIMIT ? OFFSET ?", [pagination.limit, pagination.offset]);
+		const getQuery = "SELECT * FROM users LIMIT ? OFFSET ?";
+		const [users] = await db.query(getQuery, [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(users, pagination);
 	} catch (error) {
@@ -26,11 +28,13 @@ export const update = async (req, res) => {
 		checkValidation(req);
 
 		const { id, role } = req;
-		const paramsId = parseInt(req.params.id);
-		const [[user]] = await db.query("SELECT * FROM users WHERE id = ?", paramsId);
+		const paramsId = req.params.id;
+
+		const getQuery = "SELECT * FROM users WHERE id = ?";
+		const [[user]] = await db.query(getQuery, paramsId);
 
 		if (!user) {
-			throw new NotFound("This user does not exist");
+			throw new NotFound("User not found");
 		}
 
 		/* 
@@ -48,7 +52,8 @@ export const update = async (req, res) => {
 				updatedUser.password = newHashedPassword;
 			}
 
-			await db.query("UPDATE users SET ? WHERE id = ?", [updatedUser, paramsId]);
+			const updateQuery = "UPDATE users SET ? WHERE id = ?";
+			await db.query(updateQuery, [updatedUser, paramsId]);
 
 			return apiResponse(res).send("User was successfully updated", null, 201);
 		}
@@ -64,23 +69,26 @@ export const remove = async (req, res) => {
 		checkValidation(req);
 
 		const { id, role } = req;
-		const paramsId = parseInt(req.params.id);
-		const [[user]] = await db.query("SELECT * FROM users WHERE id = ?", paramsId);
+		const paramsId = req.params.id;
+
+		const getQuery = "SELECT * FROM users WHERE id = ?";
+		const [[user]] = await db.query(getQuery, paramsId);
 
 		if (!user) {
-			throw new NotFound("This user does not exist");
+			throw new NotFound("User not found");
 		}
 
 		/* 
             Same situation as in update handler.
         */
 		if (role === "moderator" || (role === "user" && id === paramsId)) {
-			await db.query("DELETE FROM users WHERE id = ?", paramsId);
+			const delQuery = "DELETE FROM users WHERE id = ?";
+			await db.query(delQuery, paramsId);
 
-			return apiResponse(res).send("You successfully deleted this account");
+			return apiResponse(res).send("User removed");
 		}
 
-		throw new Forbidden("You cannot delete this account");
+		throw new Forbidden("You cannot remove this account");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

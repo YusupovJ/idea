@@ -8,25 +8,21 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { productId, count } = req.body;
-		const { id: userId } = req;
+		const { product_id, count } = req.body;
+		const { id: user_id } = req;
 
 		const getQuery = "SELECT * FROM products WHERE id = ?";
-		const [[product]] = await db.query(getQuery, productId);
+		const [[product]] = await db.query(getQuery, product_id);
 
 		if (!product) {
 			throw new NotFound("This product does not exist");
 		}
 
-		const newCart = {
-			product_id: productId,
-			user_id: userId,
-			count,
-		};
+		const newCart = { product_id, user_id, count };
 		const addQuery = "INSERT INTO cart SET ?";
 		await db.query(addQuery, newCart);
 
-		apiResponse(res).send("Product successfully added to your cart");
+		apiResponse(res).send("Product successfully added to your cart", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -89,7 +85,7 @@ export const update = async (req, res) => {
 		const updateQuery = "UPDATE cart SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedCart, cartId]);
 
-		apiResponse(res).send("Product was successfully updated");
+		apiResponse(res).send("Cart updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

@@ -12,13 +12,15 @@ import Token from "../helpers/generateTokens.js";
 
 const addCategories = async (categories, products_id) => {
 	for (const categoryId of categories) {
-		const [[category]] = await db.query("SELECT * FROM categories WHERE id = ?", categoryId);
+		const getQuery = "SELECT * FROM categories WHERE id = ?";
+		const [[category]] = await db.query(getQuery, categoryId);
 
 		if (!category) {
-			throw new BadRequest(`There are no categories with ${categoryId} id`);
+			throw new BadRequest(`Category with ${categoryId} id not found`);
 		}
 
-		await db.query("INSERT INTO products_categories SET ?", {
+		const addQuery = "INSERT INTO products_categories SET ?";
+		await db.query(addQuery, {
 			categories_id: categoryId,
 			products_id,
 		});
@@ -27,13 +29,15 @@ const addCategories = async (categories, products_id) => {
 
 const addEvents = async (events, products_id) => {
 	for (const eventId of events) {
-		const [[event]] = await db.query("SELECT * FROM events WHERE id = ?", eventId);
+		const getQuery = "SELECT * FROM events WHERE id = ?";
+		const [[event]] = await db.query(getQuery, eventId);
 
 		if (!event) {
-			throw new BadRequest(`There are no events with ${eventId} id`);
+			throw new BadRequest(`Event with ${eventId} id not found`);
 		}
 
-		await db.query("INSERT INTO events_products SET ?", {
+		const addQuery = "INSERT INTO events_products SET ?";
+		await db.query(addQuery, {
 			events_id: eventId,
 			products_id,
 		});
@@ -42,13 +46,15 @@ const addEvents = async (events, products_id) => {
 
 const addAttributeValues = async (attributeValues, products_id) => {
 	for (const attributeValueId of attributeValues) {
-		const [[event]] = await db.query("SELECT * FROM attribute_values WHERE id = ?", attributeValueId);
+		const getQuery = "SELECT * FROM attribute_values WHERE id = ?";
+		const [[attributeValue]] = await db.query(getQuery, attributeValueId);
 
-		if (!event) {
-			throw new BadRequest(`There are no attributes with ${attributeValueId} id`);
+		if (!attributeValue) {
+			throw new BadRequest(`Attribute value with ${attributeValueId} id not found`);
 		}
 
-		await db.query("INSERT INTO attribute_values_products SET ?", {
+		const addQuery = "INSERT INTO attribute_values_products SET ?";
+		await db.query(addQuery, {
 			attribute_values_id: attributeValueId,
 			products_id,
 		});
@@ -73,9 +79,10 @@ export const add = async (req, res) => {
 			discount: body.discount,
 		};
 
-		const [{ insertId }] = await db.query("INSERT INTO products SET ?", newProduct);
+		const addQuery = "INSERT INTO products SET ?";
+		const [{ insertId }] = await db.query(addQuery, newProduct);
 
-		const { categories, events, attributeValues } = body;
+		const { categories, events, attribute_values } = body;
 
 		if (categories) {
 			await addCategories(categories, insertId);
@@ -85,11 +92,11 @@ export const add = async (req, res) => {
 			await addEvents(events, insertId);
 		}
 
-		if (attributeValues) {
-			await addAttributeValues(attributeValues, insertId);
+		if (attribute_values) {
+			await addAttributeValues(attribute_values, insertId);
 		}
 
-		apiResponse(res).send("Product was successfully added", null, 201);
+		apiResponse(res).send("Product created", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -103,7 +110,7 @@ export const getAll = async (req, res) => {
 
 		search = search || "";
 
-		const countQuery = `
+		const getTotalItemsQuery = `
             SELECT COUNT(id) FROM products 
             WHERE name_uz LIKE '%${search}%' 
             OR name_ru LIKE '%${search}%'
@@ -112,11 +119,11 @@ export const getAll = async (req, res) => {
             OR desc_short_uz LIKE '%${search}%'
             OR desc_short_ru LIKE '%${search}%'
         `;
-		const [[{ "COUNT(id)": totalItems }]] = await db.query(countQuery);
+		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery);
 
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const sqlQuery = `
+		const getQuery = `
             SELECT * FROM products 
             WHERE name_uz LIKE '%${search}%' 
             OR name_ru LIKE '%${search}%'
@@ -127,7 +134,7 @@ export const getAll = async (req, res) => {
             LIMIT ? OFFSET ?
         `;
 
-		const [response] = await db.query(sqlQuery, [pagination.limit, pagination.offset]);
+		const [response] = await db.query(getQuery, [pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
 		const products = response.map((product) => {
@@ -152,7 +159,9 @@ export const getOne = async (req, res) => {
 		checkValidation(req);
 
 		const { id } = req.params;
-		const [[product]] = await db.query("SELECT * FROM products WHERE id = ?", id);
+
+		const getQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getQuery, id);
 
 		const getAttrQuery = `
             SELECT a.id, a.name_uz, a.name_ru, av.value_uz, av.value_ru 
@@ -161,8 +170,8 @@ export const getOne = async (req, res) => {
             JOIN attributes AS a ON a.id = av.attribute_id
             WHERE avp.products_id = ?;
         `;
-
 		const [attributeValues] = await db.query(getAttrQuery, id);
+
 		const getRatingQuery = "SELECT AVG(rating) FROM reviews WHERE product_id = ?";
 		const [[{ "AVG(rating)": rating }]] = await db.query(getRatingQuery, id);
 
@@ -171,7 +180,8 @@ export const getOne = async (req, res) => {
 		product.attributeValues = attributeValues;
 		product.isFav = false;
 
-		await db.query("UPDATE products SET views = ? WHERE id = ?", [product.views, id]);
+		const updateViewsQuery = "UPDATE products SET views = ? WHERE id = ?";
+		await db.query(updateViewsQuery, [product.views, id]);
 
 		const token = req.headers?.authorization?.split(" ")[1];
 
@@ -195,15 +205,17 @@ export const update = async (req, res) => {
 		checkValidation(req);
 
 		const { id } = req.params;
-		const [[product]] = await db.query("SELECT * FROM products WHERE id = ?", id);
+		const getQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getQuery, id);
 
 		if (!product) {
-			throw new NotFound("This product does not exist");
+			throw new NotFound("Product not found");
 		}
 
 		const { events, categories, attributeValues, ...updatedProduct } = { ...req.body, updated_at: new Date() };
 
-		await db.query("UPDATE products SET ? WHERE id = ?", [updatedProduct, +id]);
+		const updateQuery = "UPDATE products SET ? WHERE id = ?";
+		await db.query(updateQuery, [updatedProduct, +id]);
 
 		if (categories) {
 			await db.query("DELETE FROM products_categories WHERE products_id = ?", id);
@@ -220,7 +232,7 @@ export const update = async (req, res) => {
 			await addAttributeValues(attributeValues, id);
 		}
 
-		apiResponse(res).send("Product was succefully updated", null, 201);
+		apiResponse(res).send("Product updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -231,15 +243,18 @@ export const remove = async (req, res) => {
 		checkValidation(req);
 
 		const { id } = req.params;
-		const [[product]] = await db.query("SELECT * FROM products WHERE id = ?", id);
+
+		const getQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getQuery, id);
 
 		if (!product) {
-			throw new NotFound("This product does not exist");
+			throw new NotFound("Product not found");
 		}
 
-		await db.query("DELETE FROM products WHERE id = ?", id);
+		const delQuery = "DELETE FROM products WHERE id = ?";
+		await db.query(delQuery, id);
 
-		apiResponse(res).send("Product was succefully deleted", null);
+		apiResponse(res).send("Product removed");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

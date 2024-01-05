@@ -77,12 +77,12 @@ export const update = async (req, res) => {
 			throw new NotFound("Delivery not found");
 		}
 
-		const updatedDelivery = req.body;
+		const updatedDelivery = { ...req.body, updated_at: new Date() };
 
 		const updateQuery = "UPDATE delivery SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedDelivery, deliveryId]);
 
-		apiResponse(res).send("Delivery updated");
+		apiResponse(res).send("Delivery updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

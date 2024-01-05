@@ -14,7 +14,7 @@ export const add = async (req, res) => {
 		const addQuery = "INSERT INTO address SET ?";
 		await db.query(addQuery, newAddress);
 
-		apiResponse(res).send("Address was successfully added", null, 201);
+		apiResponse(res).send("Address created", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -59,7 +59,7 @@ export const update = async (req, res) => {
 		const updateQuery = "UPDATE address SET ? WHERE id = ?";
 		await db.query(updateQuery, [updatedAddress, addressId]);
 
-		apiResponse(res).send("Address was successfully updated");
+		apiResponse(res).send("Address updated", null, 201);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -82,7 +82,7 @@ export const remove = async (req, res) => {
 		const delQuery = "DELETE FROM address WHERE id = ?";
 		await db.query(delQuery, addressId);
 
-		apiResponse(res).send("Address was successfully removed");
+		apiResponse(res).send("Address removed");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
