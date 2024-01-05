@@ -84,6 +84,23 @@ export const getAll = async (req, res) => {
 export const update = async (req, res) => {
 	try {
 		checkValidation(req);
+
+		const { id: orderId } = req.params;
+		const { id: userId } = req;
+
+		const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
+		const [[order]] = await db.query(getQuery, [orderId, userId]);
+
+		if (!order) {
+			throw new NotFound("Order not found");
+		}
+
+		const updatedOrder = req.body;
+
+		const updateQuery = "UPDATE orders SET ? WHERE id = ?";
+		await db.query(updateQuery, [updatedOrder, orderId]);
+
+		apiResponse(res).send("Order updated");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}
@@ -92,6 +109,21 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
 	try {
 		checkValidation(req);
+
+		const { id: orderId } = req.params;
+		const { id: userId } = req;
+
+		const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
+		const [[order]] = await db.query(getQuery, [orderId, userId]);
+
+		if (!order) {
+			throw new NotFound("Order not found");
+		}
+
+		const delQuery = "DELETE FROM orders WHERE id = ?";
+		await db.query(delQuery, orderId);
+
+		apiResponse(res).send("Order deleted");
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

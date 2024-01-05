@@ -2,9 +2,10 @@ import { body, query } from "express-validator";
 import { paginationQuery } from "./customValidators.js";
 
 export const addDeliveryValidator = [
-	body("addressId").notEmpty().isInt({ min: 1 }).withMessage("addressId must be id"),
-	body("deliverId").notEmpty().isInt({ min: 1 }).withMessage("deliverId must be id"),
-	body("deliveryFee").notEmpty().isInt({ min: 0 }).withMessage("delivery fee must be provided"),
+	body("address_id").notEmpty().isInt({ min: 1 }).withMessage("address_id must be id"),
+	body("deliver_id").notEmpty().isInt({ min: 1 }).withMessage("deliver_id must be id"),
+	body("delivery_fee").notEmpty().isInt({ min: 0 }).withMessage("delivery_fee must be integer"),
+	body("total_price").notEmpty().isInt({ min: 0 }).withMessage("total_price must be integer"),
 	body("note").optional().isString().withMessage("note must be string"),
 ];
 
@@ -14,8 +15,9 @@ export const getAllDeliveryValidator = [
 ];
 
 export const updateDeliveryValidator = [
-	body("addressId").optional().isInt({ min: 1 }).withMessage("addressId must be id"),
-	body("deliverId").optional().isInt({ min: 1 }).withMessage("deliverId must be id"),
-	body("deliveryFee").optional().isInt({ min: 0 }).withMessage("delivery fee must be provided"),
+	body("address_id").optional().isInt({ min: 1 }).withMessage("address_id must be id"),
+	body("deliver_id").optional().isInt({ min: 1 }).withMessage("deliver_id must be id"),
+	body("delivery_fee").optional().isInt({ min: 0 }).withMessage("delivery_fee must be integer"),
+	body("total_price").optional().isInt({ min: 0 }).withMessage("total_price must be integer"),
 	body("note").optional().isString().withMessage("note must be string"),
 ];
