@@ -146,7 +146,6 @@ export const update = async (req, res) => {
 
 		apiResponse(res).send("Order updated", null, 201);
 	} catch (error) {
-		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };

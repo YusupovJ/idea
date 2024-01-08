@@ -75,7 +75,6 @@ export const getAll = async (req, res) => {
 
 		apiResponse(res).send(reviews, pagination);
 	} catch (error) {
-		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };
