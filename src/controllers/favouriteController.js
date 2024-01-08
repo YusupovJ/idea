@@ -18,7 +18,7 @@ export const add = async (req, res) => {
 			throw new BadRequest("You've already added this product to favourites");
 		}
 
-		const newFavourite = { products_id, users_id };
+		const newFavourite = { products_id: product_id, users_id };
 
 		const addQuery = "INSERT INTO users_products SET ?";
 		await db.query(addQuery, newFavourite);

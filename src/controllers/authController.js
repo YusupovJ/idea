@@ -88,7 +88,7 @@ export const refresh = async (req, res) => {
 		const getQuery = "SELECT * FROM users WHERE id = ?";
 		const [[user]] = await db.query(getQuery, id);
 
-		const isTokenRight = crypt.compare(refreshToken, user.refresh_token);
+		const isTokenRight = crypt.compare(refresh_token, user.refresh_token);
 
 		if (!isTokenRight) {
 			throw new BadRequest("Your token is not valid");

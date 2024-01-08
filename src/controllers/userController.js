@@ -3,6 +3,7 @@ import db from "../config/db.config.js";
 import Pagination from "../helpers/pagination.js";
 import { Forbidden, NotFound } from "../helpers/errors.js";
 import crypt from "../helpers/hash.js";
+import checkValidation from "../helpers/checkValidation.js";
 
 export const getAll = async (req, res) => {
 	try {
@@ -14,7 +15,7 @@ export const getAll = async (req, res) => {
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const getQuery = "SELECT * FROM users LIMIT ? OFFSET ?";
+		const getQuery = "SELECT id, name, email, phone, created_at, updated_at FROM users LIMIT ? OFFSET ?";
 		const [users] = await db.query(getQuery, [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(users, pagination);

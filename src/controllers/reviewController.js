@@ -46,25 +46,27 @@ export const getAll = async (req, res) => {
 		const getTotalItemsQuery = `
             SELECT COUNT(r.id)
             FROM reviews AS r
-            JOIN reviews AS ra
+            LEFT JOIN reviews AS ra
             ON ra.answer_to = r.id            
             WHERE r.product_id = ?            
             AND r.answer_to IS NULL
         `;
-		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery, productId);
+		const [[{ "COUNT(r.id)": totalItems }]] = await db.query(getTotalItemsQuery, productId);
 
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
             SELECT 
-            r.id AS review_id, ra.id AS answer_id, r.text AS review_text, 
+            r.id AS review_id, r.user_id, u.name, ra.id AS answer_id, r.text AS review_text, 
             ra.text AS answer_text, r.rating, r.image AS review_image,
             ra.image AS answer_image, r.created_at AS review_created_at, 
             r.updated_at AS review_updated_at, ra.created_at AS answer_created_at, 
             ra.updated_at AS answer_updated_at
             FROM reviews AS r
-            JOIN reviews AS ra
-            ON ra.answer_to = r.id            
+            LEFT JOIN reviews AS ra
+            ON ra.answer_to = r.id       
+            JOIN users AS u
+            ON u.id = r.user_id     
             WHERE r.product_id = ?        
             AND r.answer_to IS NULL
             LIMIT ? OFFSET ?
@@ -74,6 +76,31 @@ export const getAll = async (req, res) => {
 		apiResponse(res).send(reviews, pagination);
 	} catch (error) {
 		console.log(error);
+		apiResponse(res).throw(error);
+	}
+};
+
+export const getOne = async (req, res) => {
+	try {
+		checkValidation(req);
+
+		const { id } = req.params;
+
+		const getQuery = `
+            SELECT r.id, r.user_id, r.text, r.rating, r.image, u.name, r.created_at, r.updated_at
+            FROM reviews AS r
+            JOIN users AS u
+            ON u.id = r.user_id 
+            WHERE r.id = ?
+        `;
+		const [[review]] = await db.query(getQuery, id);
+
+		if (!review) {
+			throw new NotFound("Review not found");
+		}
+
+		apiResponse(res).send(review);
+	} catch (error) {
 		apiResponse(res).throw(error);
 	}
 };

@@ -179,6 +179,7 @@ export const getOne = async (req, res) => {
 		product.rating = rating || 0;
 		product.attributeValues = attributeValues;
 		product.isFav = false;
+		product.images = product?.images?.split(",") || [];
 
 		const updateViewsQuery = "UPDATE products SET views = ? WHERE id = ?";
 		await db.query(updateViewsQuery, [product.views, id]);

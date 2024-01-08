@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { add, getAll, remove, update } from "../controllers/attributeController.js";
+import { add, getAll, getOne, remove, update } from "../controllers/attributeController.js";
 import { isId } from "../validators/customValidators.js";
 import { addAttributeValidator, getAllAttributesValidator, updateAttributeValidator } from "../validators/attributeValidator.js";
 import roleGuard from "../middlewares/roleGuard.js";
@@ -11,6 +11,7 @@ attributeRoute.use("/values", valueRoute);
 
 attributeRoute.post("/", ...roleGuard("moderator"), addAttributeValidator, add);
 attributeRoute.get("/", ...roleGuard("moderator"), getAllAttributesValidator, getAll);
+attributeRoute.get("/:id", ...roleGuard("moderator"), isId, getOne);
 attributeRoute.patch("/:id", ...roleGuard("moderator"), updateAttributeValidator, isId, update);
 attributeRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
 

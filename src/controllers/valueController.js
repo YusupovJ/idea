@@ -44,6 +44,31 @@ export const getAll = async (req, res) => {
 	}
 };
 
+export const getOne = async (req, res) => {
+	try {
+		checkValidation(req);
+
+		const { id } = req.params;
+
+		const getQuery = `
+            SELECT av.attribute_id, av.id AS attr_value_id, a.name_uz, a.name_ru, av.value_uz, av.value_ru
+            FROM attribute_values AS av
+            JOIN attributes AS a
+            ON a.id = av.attribute_id
+            WHERE av.id = ?
+        `;
+		const [[value]] = await db.query(getQuery, id);
+
+		if (!value) {
+			throw new NotFound("Attribute value not found");
+		}
+
+		apiResponse(res).send(value);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
+};
+
 export const update = async (req, res) => {
 	try {
 		checkValidation(req);

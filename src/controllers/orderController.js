@@ -5,52 +5,52 @@ import { NotFound } from "../helpers/errors.js";
 import Pagination from "../helpers/pagination.js";
 
 export const add = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { product_id, count } = req.body;
-        const { id: user_id } = req;
+		const { product_id, count } = req.body;
+		const { id: user_id } = req;
 
-        const getQuery = "SELECT * FROM products WHERE id = ?";
-        const [[product]] = await db.query(getQuery, product_id);
+		const getQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getQuery, product_id);
 
-        if (!product) {
-            throw new NotFound("Product not found");
-        }
+		if (!product) {
+			throw new NotFound("Product not found");
+		}
 
-        const newOrder = {
-            product_id,
-            count,
-            status: null,
-            user_id,
-            delivery_id: null,
-        };
+		const newOrder = {
+			product_id,
+			count,
+			status: null,
+			user_id,
+			delivery_id: null,
+		};
 
-        const addQuery = "INSERT INTO orders SET ?";
-        await db.query(addQuery, newOrder);
+		const addQuery = "INSERT INTO orders SET ?";
+		await db.query(addQuery, newOrder);
 
-        const updateOrdersQuery = "UPDATE products SET orders = orders + 1, count = ? WHERE id = ?";
-        await db.query(updateOrdersQuery, [product.count - count, productId]);
+		const updateOrdersQuery = "UPDATE products SET orders = orders + 1, count = ? WHERE id = ?";
+		await db.query(updateOrdersQuery, [product.count - count, product_id]);
 
-        apiResponse(res).send("Order created", null, 201);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		apiResponse(res).send("Order created", null, 201);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const getAll = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { id: userId } = req;
-        const { page, limit } = req.query;
+		const { id: userId } = req;
+		const { page, limit } = req.query;
 
-        const getTotalItemsQuery = "SELECT COUNT(id) FROM orders WHERE user_id = ?";
-        const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery, userId);
+		const getTotalItemsQuery = "SELECT COUNT(id) FROM orders WHERE user_id = ?";
+		const [[{ "COUNT(id)": totalItems }]] = await db.query(getTotalItemsQuery, userId);
 
-        const pagination = new Pagination(totalItems, page, limit);
+		const pagination = new Pagination(totalItems, page, limit);
 
-        const getQuery = `
+		const getQuery = `
             SELECT o.id, o.count AS order_count, o.status AS delivery_status, o.delivery_id, o.created_at, o.updated_at,
             o.product_id, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, p.desc_short_uz, p.desc_short_ru,
             p.count AS product_count, p.views, p.orders, p.images, p.price, p.discount
@@ -61,33 +61,34 @@ export const getAll = async (req, res) => {
             LIMIT ? OFFSET ?
         `;
 
-        const [result] = await db.query(getQuery, [userId, pagination.limit, pagination.offset]);
+		const [result] = await db.query(getQuery, [userId, pagination.limit, pagination.offset]);
 
-        // replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
-        const orders = result.map((order) => {
-            if (order.images) {
-                return {
-                    ...order,
-                    images: order.images.split(","),
-                };
-            }
+		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
+		const orders = result.map((order) => {
+			if (order.images) {
+				return {
+					...order,
+					images: order.images.split(","),
+				};
+			}
 
-            return [];
-        });
+			return [];
+		});
 
-        apiResponse(res).send(orders, pagination);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		apiResponse(res).send(orders, pagination);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const getOne = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { id } = req.params;
+		const { id: orderId } = req.params;
+		const { id: userId } = req;
 
-        const getQuery = `
+		const getQuery = `
             SELECT o.id, o.count AS order_count, o.status AS delivery_status, o.delivery_id, o.created_at, o.updated_at,
             o.product_id, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, p.desc_short_uz, p.desc_short_ru,
             p.count AS product_count, p.views, p.orders, p.images, p.price, p.discount
@@ -97,62 +98,89 @@ export const getOne = async (req, res) => {
             WHERE user_id = ?
 			AND o.id = ?
         `;
-        const [[order]] = await db.query(getQuery, id);
+		const [[order]] = await db.query(getQuery, [userId, orderId]);
 
-        if (!order) {
-            throw new NotFound("Order not found");
-        }
+		order.images = order?.images?.split(",") || [];
 
-        apiResponse(res).send(order);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		if (!order) {
+			throw new NotFound("Order not found");
+		}
+
+		apiResponse(res).send(order);
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };
 
 export const update = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { id: orderId } = req.params;
-        const { id: userId } = req;
+		const { id: orderId } = req.params;
+		const { id: userId } = req;
 
-        const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
-        const [[order]] = await db.query(getQuery, [orderId, userId]);
+		const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
+		const [[order]] = await db.query(getQuery, [orderId, userId]);
 
-        if (!order) {
-            throw new NotFound("Order not found");
-        }
+		if (!order) {
+			throw new NotFound("Order not found");
+		}
 
-        const updatedOrder = req.body;
+		const product_id = order.product_id;
+		const getProductQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getProductQuery, product_id);
 
-        const updateQuery = "UPDATE orders SET ? WHERE id = ?";
-        await db.query(updateQuery, [updatedOrder, orderId]);
+		if (!product) {
+			throw new NotFound("Product not found");
+		}
 
-        apiResponse(res).send("Order updated", null, 201);
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		const updatedOrder = req.body;
+
+		const updateQuery = "UPDATE orders SET ? WHERE id = ?";
+		await db.query(updateQuery, [updatedOrder, orderId]);
+
+		if (updatedOrder.count) {
+			const updateCountQuery = "UPDATE products SET count = ? WHERE id = ?";
+			await db.query(updateCountQuery, [product.count + order.count - updatedOrder.count, product_id]);
+		}
+
+		apiResponse(res).send("Order updated", null, 201);
+	} catch (error) {
+		console.log(error);
+		apiResponse(res).throw(error);
+	}
 };
 
 export const remove = async (req, res) => {
-    try {
-        checkValidation(req);
+	try {
+		checkValidation(req);
 
-        const { id: orderId } = req.params;
-        const { id: userId } = req;
+		const { id: orderId } = req.params;
+		const { id: userId } = req;
 
-        const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
-        const [[order]] = await db.query(getQuery, [orderId, userId]);
+		const getQuery = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
+		const [[order]] = await db.query(getQuery, [orderId, userId]);
 
-        if (!order) {
-            throw new NotFound("Order not found");
-        }
+		if (!order) {
+			throw new NotFound("Order not found");
+		}
 
-        const delQuery = "DELETE FROM orders WHERE id = ?";
-        await db.query(delQuery, orderId);
+		const product_id = order.product_id;
+		const getProductQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getProductQuery, product_id);
 
-        apiResponse(res).send("Order deleted");
-    } catch (error) {
-        apiResponse(res).throw(error);
-    }
+		if (!product) {
+			throw new NotFound("Product not found");
+		}
+
+		const updateProductQuery = "UPDATE products SET orders = orders - 1, count = ? WHERE id = ?";
+		await db.query(updateProductQuery, [product.count + order.count, product_id]);
+
+		const delQuery = "DELETE FROM orders WHERE id = ?";
+		await db.query(delQuery, orderId);
+
+		apiResponse(res).send("Order deleted");
+	} catch (error) {
+		apiResponse(res).throw(error);
+	}
 };

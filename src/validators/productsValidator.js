@@ -23,12 +23,12 @@ export const getAllProductsValidator = [
 ];
 
 export const updateProductValidator = [
-	body("name_uz").optional().withMessage("name_uz must be string"),
-	body("name_ru").optional().withMessage("name_ru must be string"),
-	body("desc_ru").optional().withMessage("desc_ru must be string"),
-	body("desc_uz").optional().withMessage("desc_uz must be string"),
-	body("desc_short_uz").optional().withMessage("desc_short_uz must be string"),
-	body("desc_short_ru").optional().withMessage("desc_short_ru must be string"),
+	body("name_uz").optional().isString().withMessage("name_uz must be string"),
+	body("name_ru").optional().isString().withMessage("name_ru must be string"),
+	body("desc_ru").optional().isString().withMessage("desc_ru must be string"),
+	body("desc_uz").optional().isString().withMessage("desc_uz must be string"),
+	body("desc_short_uz").optional().isString().withMessage("desc_short_uz must be string"),
+	body("desc_short_ru").optional().isString().withMessage("desc_short_ru must be string"),
 	body("count").optional().isInt({ min: 1 }).withMessage("count must be at least 1"),
 	body("images").optional().isArray().withMessage("images must be an array of image urls"),
 	body("price").optional().isInt({ min: 100 }).withMessage("price must be at least 100"),
