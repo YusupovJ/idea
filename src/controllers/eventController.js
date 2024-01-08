@@ -40,6 +40,38 @@ export const getAll = async (req, res) => {
     }
 };
 
+export const getOne = async (req, res) => {
+    try {
+        checkValidation(req);
+
+        const { id } = req.params;
+
+        const getQuery = `
+            SELECT e.name_uz AS event_name_uz, e.name_ru AS event_name_ru,
+            p.id, p.name_uz AS product_name_uz, p.name_ru AS product_name_ru, p.desc_ru, p.desc_uz, 
+            p.desc_short_uz, p.desc_short_ru, p.orders, p.views,
+            p.count, p.images, p.price, p.discount, p.created_at, p.updated_at
+            FROM events_products AS ep
+            JOIN events AS e
+            ON e.id = ep.events_id
+            JOIN products AS p
+            ON p.id = ep.products_id
+            WHERE e.id = ?
+        `;
+        const [[event]] = await db.query(getQuery, id);
+
+        event.images = event?.images?.split(",");
+
+        if (!event) {
+            throw new NotFound("Event not found");
+        }
+
+        apiResponse(res).send(event);
+    } catch (error) {
+        apiResponse(res).throw(error);
+    }
+};
+
 export const update = async (req, res) => {
     try {
         checkValidation(req);
