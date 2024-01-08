@@ -106,17 +106,24 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		let { page, limit, search, categoryId, attributeValues } = req.query;
+		let { page, limit, search, categoryId, attributeValues, eventId } = req.query;
+		const addingElements = [];
 
-		attributeValues = JSON.parse(attributeValues);
-
+		attributeValues = JSON.parse(attributeValues || "[]");
 		search = search || "";
 
 		let ifCategory = "";
+		let ifEvent = "";
 		let ifAttributeValues = "";
 
 		if (categoryId) {
 			ifCategory = "AND pc.categories_id = ?";
+			addingElements.unshift(+categoryId);
+		}
+
+		if (eventId) {
+			ifEvent = "AND ep.events_id = ?";
+			addingElements.unshift(+eventId);
 		}
 
 		if (attributeValues.length > 0) {
@@ -129,14 +136,16 @@ export const getAll = async (req, res) => {
 
 		const getTotalItemsQuery = `
             SELECT COUNT(DISTINCT(p.id)) FROM products AS p 
-            LEFT JOIN products_categories AS pc
+            JOIN products_categories AS pc
             ON pc.products_id = p.id
-            LEFT JOIN categories AS c
+            JOIN categories AS c
             ON pc.categories_id = c.id
-            LEFT JOIN attribute_values_products AS avp
+            JOIN attribute_values_products AS avp
             ON avp.products_id = p.id
-            LEFT JOIN attribute_values AS av
+            JOIN attribute_values AS av
             ON av.id = avp.attribute_values_id
+            JOIN events_products AS ep
+            ON ep.products_id = p.id
             WHERE p.name_uz LIKE '%${search}%'
             OR p.name_ru LIKE '%${search}%'
             OR p.desc_ru LIKE '%${search}%'
@@ -144,10 +153,11 @@ export const getAll = async (req, res) => {
             OR p.desc_short_uz LIKE '%${search}%'
             OR p.desc_short_ru LIKE '%${search}%'
             ${ifCategory}
+            ${ifEvent}
             ${ifAttributeValues}
         `;
 
-		const [[{ "COUNT(DISTINCT(p.id))": totalItems }]] = await db.query(getTotalItemsQuery, categoryId);
+		const [[{ "COUNT(DISTINCT(p.id))": totalItems }]] = await db.query(getTotalItemsQuery, addingElements);
 
 		const pagination = new Pagination(totalItems, page, limit);
 
@@ -157,14 +167,16 @@ export const getAll = async (req, res) => {
                 p.count, p.images, p.price, p.discount, p.created_at, p.updated_at, c.name_uz AS category_name_uz,
                 c.name_ru AS category_name_ru
                 FROM products AS p
-                LEFT JOIN products_categories AS pc
+                JOIN products_categories AS pc
                 ON pc.products_id = p.id
-                LEFT JOIN categories AS c
+                JOIN categories AS c
                 ON pc.categories_id = c.id
-                LEFT JOIN attribute_values_products AS avp
+                JOIN attribute_values_products AS avp
                 ON avp.products_id = p.id
-                LEFT JOIN attribute_values AS av
+                JOIN attribute_values AS av
                 ON av.id = avp.attribute_values_id
+                JOIN events_products AS ep
+                ON ep.products_id = p.id
                 WHERE p.name_uz LIKE '%${search}%'
                 OR p.name_ru LIKE '%${search}%'
                 OR p.desc_ru LIKE '%${search}%'
@@ -173,10 +185,11 @@ export const getAll = async (req, res) => {
                 OR p.desc_short_ru LIKE '%${search}%'
                 ${ifCategory}
                 ${ifAttributeValues}
+                ${ifEvent}
                 LIMIT ? OFFSET ?
         `;
 
-		const [response] = await db.query(getQuery, [categoryId, pagination.limit, pagination.offset]);
+		const [response] = await db.query(getQuery, [...addingElements, pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
 		const products = response.map((product) => {
@@ -192,6 +205,7 @@ export const getAll = async (req, res) => {
 
 		apiResponse(res).send(products, pagination);
 	} catch (error) {
+		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };
