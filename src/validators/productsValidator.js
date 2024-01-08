@@ -17,11 +17,21 @@ export const addProductValidator = [
 	body("attribute_values").optional().isArray().withMessage("attribute_values must be an array of ids"),
 ];
 
+const hasValue = (...availableValues) => {
+	return (input) => {
+		return availableValues.includes(input);
+	};
+};
+
+const sortByValidation = hasValue("rating", "price", "orders", "views");
+
 export const getAllProductsValidator = [
 	query("page").optional().custom(paginationQuery).withMessage("page must be an integer and no less than 1"),
 	query("limit").optional().custom(paginationQuery).withMessage("limit must be an integer and no less than 1"),
 	query("search").optional().isString().withMessage("search query must be string"),
 	query("attributeValues").optional().isJSON().withMessage("attributeValues must be json array of ids"),
+	query("sortBy").optional().custom(sortByValidation).withMessage("value of sortBy can be price, rating, orders and views"),
+	query("orderBy").optional().custom(hasValue("ascending", "descending")).withMessage("value of orderBy can be ascending or descending"),
 ];
 
 export const updateProductValidator = [

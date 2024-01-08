@@ -74,7 +74,7 @@ export const add = async (req, res) => {
 			desc_short_uz: body.desc_short_uz,
 			desc_short_ru: body.desc_short_ru,
 			count: body.count,
-			images: body?.images.join(",") || [],
+			images: body?.images?.join(",") || null,
 			price: body.price,
 			discount: body.discount,
 		};
@@ -106,7 +106,7 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		let { page, limit, search, categoryId, attributeValues, eventId } = req.query;
+		let { page, limit, search, categoryId, attributeValues, eventId, sortBy, orderBy } = req.query;
 		const addingElements = [];
 
 		attributeValues = JSON.parse(attributeValues || "[]");
@@ -114,7 +114,9 @@ export const getAll = async (req, res) => {
 
 		let ifCategory = "";
 		let ifEvent = "";
-		let ifAttributeValues = "";
+		let ifOrderBy = "";
+		let joinAttributeValues = "";
+		let checkAttributeValues = "";
 
 		if (categoryId) {
 			ifCategory = "AND pc.categories_id = ?";
@@ -127,34 +129,39 @@ export const getAll = async (req, res) => {
 		}
 
 		if (attributeValues.length > 0) {
-			ifAttributeValues = attributeValues
+			joinAttributeValues = attributeValues
 				.map((id) => {
-					return `AND av.id = ${id}`;
+					return `LEFT JOIN attribute_values_products AS avp${id} ON avp${id}.products_id = p.id AND avp${id}.attribute_values_id = ${id}`;
+				})
+				.join("\n");
+
+			checkAttributeValues = attributeValues
+				.map((id) => {
+					return `AND avp${id}.products_id IS NOT NULL`;
 				})
 				.join("\n");
 		}
 
+		const orderByQuery = orderBy === "descending" ? "DESC" : "ASC";
+
+		if (sortBy) {
+			ifOrderBy = `ORDER BY ${sortBy} ${orderByQuery}`;
+		}
+
 		const getTotalItemsQuery = `
-            SELECT COUNT(DISTINCT(p.id)) FROM products AS p 
-            JOIN products_categories AS pc
-            ON pc.products_id = p.id
-            JOIN categories AS c
-            ON pc.categories_id = c.id
-            JOIN attribute_values_products AS avp
-            ON avp.products_id = p.id
-            JOIN attribute_values AS av
-            ON av.id = avp.attribute_values_id
-            JOIN events_products AS ep
-            ON ep.products_id = p.id
-            WHERE p.name_uz LIKE '%${search}%'
-            OR p.name_ru LIKE '%${search}%'
-            OR p.desc_ru LIKE '%${search}%'
-            OR p.desc_uz LIKE '%${search}%'
-            OR p.desc_short_uz LIKE '%${search}%'
-            OR p.desc_short_ru LIKE '%${search}%'
-            ${ifCategory}
-            ${ifEvent}
-            ${ifAttributeValues}
+                SELECT COUNT(DISTINCT(p.id)) FROM products AS p
+                LEFT JOIN products_categories AS pc ON pc.products_id = p.id
+                LEFT JOIN categories AS c ON pc.categories_id = c.id
+                ${joinAttributeValues}
+                WHERE (p.name_uz LIKE '%${search}%'
+                OR p.name_ru LIKE '%${search}%'
+                OR p.desc_ru LIKE '%${search}%'
+                OR p.desc_uz LIKE '%${search}%'
+                OR p.desc_short_uz LIKE '%${search}%'
+                OR p.desc_short_ru LIKE '%${search}%')
+                ${ifCategory}
+                ${ifEvent}
+                ${checkAttributeValues}
         `;
 
 		const [[{ "COUNT(DISTINCT(p.id))": totalItems }]] = await db.query(getTotalItemsQuery, addingElements);
@@ -162,30 +169,25 @@ export const getAll = async (req, res) => {
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
-                SELECT DISTINCT(p.id), p.name_uz AS product_name_uz, p.name_ru AS product_name_ru, p.desc_ru, p.desc_uz, 
-                p.desc_short_uz, p.desc_short_ru, p.orders, p.views,
-                p.count, p.images, p.price, p.discount, p.created_at, p.updated_at, c.name_uz AS category_name_uz,
-                c.name_ru AS category_name_ru
+                SELECT DISTINCT p.id, p.name_uz AS product_name_uz, p.name_ru AS product_name_ru, p.desc_ru, p.desc_uz,
+                p.desc_short_uz, p.desc_short_ru, p.orders, p.views, r.rating,
+                p.count, p.images, p.price, p.discount, p.created_at, p.updated_at, 
+                c.name_uz AS category_name_uz, c.name_ru AS category_name_ru
                 FROM products AS p
-                JOIN products_categories AS pc
-                ON pc.products_id = p.id
-                JOIN categories AS c
-                ON pc.categories_id = c.id
-                JOIN attribute_values_products AS avp
-                ON avp.products_id = p.id
-                JOIN attribute_values AS av
-                ON av.id = avp.attribute_values_id
-                JOIN events_products AS ep
-                ON ep.products_id = p.id
-                WHERE p.name_uz LIKE '%${search}%'
+                LEFT JOIN products_categories AS pc ON pc.products_id = p.id
+                LEFT JOIN categories AS c ON pc.categories_id = c.id
+                LEFT JOIN reviews AS r ON r.product_id = p.id
+                ${joinAttributeValues}
+                WHERE (p.name_uz LIKE '%${search}%'
                 OR p.name_ru LIKE '%${search}%'
                 OR p.desc_ru LIKE '%${search}%'
                 OR p.desc_uz LIKE '%${search}%'
                 OR p.desc_short_uz LIKE '%${search}%'
-                OR p.desc_short_ru LIKE '%${search}%'
+                OR p.desc_short_ru LIKE '%${search}%')
                 ${ifCategory}
-                ${ifAttributeValues}
                 ${ifEvent}
+                ${checkAttributeValues}
+                ${ifOrderBy}
                 LIMIT ? OFFSET ?
         `;
 
@@ -200,7 +202,7 @@ export const getAll = async (req, res) => {
 				};
 			}
 
-			return [];
+			return product;
 		});
 
 		apiResponse(res).send(products, pagination);
