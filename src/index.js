@@ -1,4 +1,5 @@
-import express from "express";
+import express, { Router } from "express";
+import serverless from "serverless-http";
 import env from "./config/env.config.js";
 import authRoute from "./routes/authRoute.js";
 import productRoute from "./routes/productRoute.js";
@@ -15,20 +16,23 @@ import attributeRoute from "./routes/attributeRoute.js";
 
 const app = express();
 const port = env.PORT;
+const router = Router();
 
-app.use(express.json());
-app.use("/auth", authRoute);
-app.use("/products", productRoute);
-app.use("/users", userRoute);
-app.use("/categories", categoryRoute);
-app.use("/events", eventRoute);
-app.use("/favourites", favouriteRoute);
-app.use("/cart", cartRoute);
-app.use("/address", addressRoute);
-app.use("/reviews", reviewRoute);
-app.use("/orders", orderRoute);
-app.use("/delivery", deliveryRoute);
-app.use("/attributes", attributeRoute);
+router.use(express.json());
+router.use("/auth", authRoute);
+router.use("/products", productRoute);
+router.use("/users", userRoute);
+router.use("/categories", categoryRoute);
+router.use("/events", eventRoute);
+router.use("/favourites", favouriteRoute);
+router.use("/cart", cartRoute);
+router.use("/address", addressRoute);
+router.use("/reviews", reviewRoute);
+router.use("/orders", orderRoute);
+router.use("/delivery", deliveryRoute);
+router.use("/attributes", attributeRoute);
+
+app.use("/api", router);
 
 app.listen(port, () => {
 	try {
@@ -37,3 +41,5 @@ app.listen(port, () => {
 		console.log(error);
 	}
 });
+
+export const handler = serverless(app);
