@@ -207,7 +207,6 @@ export const getAll = async (req, res) => {
 
 		apiResponse(res).send(products, pagination);
 	} catch (error) {
-		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };
