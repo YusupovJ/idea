@@ -1,5 +1,4 @@
 import express, { Router } from "express";
-import serverless from "serverless-http";
 import env from "./config/env.config.js";
 import authRoute from "./routes/authRoute.js";
 import productRoute from "./routes/productRoute.js";
@@ -42,4 +41,4 @@ app.listen(port, () => {
 	}
 });
 
-export const handler = serverless(app);
+export default router;
