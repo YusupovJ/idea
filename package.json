@@ -1,12 +1,11 @@
 {
-	"name": "kishmish market",
+	"name": "kishmish-market",
 	"version": "1.0.0",
 	"description": "market with a lot of products",
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon ./src/index.js",
-		"build": ""
+		"dev": "nodemon ./src/index.js"
 	},
 	"keywords": [],
 	"author": "Jamshid",
