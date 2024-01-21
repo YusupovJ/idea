@@ -5,8 +5,7 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon ./src/index.js",
-		"build": "echo \"Hello world!\""
+		"dev": "nodemon ./src/index.js"
 	},
 	"keywords": [],
 	"author": "Jamshid",
@@ -17,9 +16,7 @@
 		"express": "^4.18.2",
 		"express-validator": "^7.0.1",
 		"jsonwebtoken": "^9.0.2",
-		"mysql2": "^3.6.3",
-		"serverless-http": "^3.2.0",
-		"simplecrypt": "^0.1.0"
+		"mysql2": "^3.6.3"
 	},
 	"devDependencies": {
 		"nodemon": "^3.0.1"

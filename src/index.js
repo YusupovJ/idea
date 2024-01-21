@@ -33,12 +33,10 @@ router.use("/attributes", attributeRoute);
 
 app.use("/api", router);
 
-app.listen(port, () => {
-	try {
-		console.log(`Server was started on port ${port}`);
-	} catch (error) {
-		console.log(error);
+app.listen(port, (error) => {
+	if (error) {
+		console.log("Hello world!");
+		return;
 	}
+	console.log(`Server was started on port ${port}`);
 });
-
-export default router;
