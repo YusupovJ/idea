@@ -8,9 +8,9 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { name_uz, name_ru } = req.body;
+		const { name } = req.body;
 
-		const newAttribute = { name_uz, name_ru };
+		const newAttribute = { name };
 
 		const addQuery = "INSERT INTO attributes SET ?";
 		await db.query(addQuery, newAttribute);
@@ -47,12 +47,12 @@ export const getOne = async (req, res) => {
 		const { id } = req.params;
 
 		const getQuery = `
-            SELECT av.attribute_id, av.id AS attr_value_id, a.name_uz, a.name_ru, av.value_uz, av.value_ru
-            FROM attributes AS a
-            JOIN attribute_values AS av
-            ON a.id = av.attribute_id
-            WHERE a.id = ?
-        `;
+      SELECT av.attribute_id, av.id AS attr_value_id, a.name, av.value
+      FROM attributes AS a
+      LEFT JOIN attribute_values AS av
+      ON a.id = av.attribute_id
+      WHERE a.id = ?
+    `;
 
 		const [attribute] = await db.query(getQuery, id);
 

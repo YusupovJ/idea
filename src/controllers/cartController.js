@@ -39,15 +39,15 @@ export const getAll = async (req, res) => {
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
-            SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
-            p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
-            p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
-            p.created_at, p.updated_at FROM cart AS c
-            JOIN products AS p
-            ON p.id = c.product_id
-            WHERE user_id = ?
-            LIMIT ? OFFSET ?
-        `;
+      SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
+      p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
+      p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
+      p.created_at, p.updated_at FROM cart AS c
+      JOIN products AS p
+      ON p.id = c.product_id
+      WHERE user_id = ?
+      LIMIT ? OFFSET ?
+    `;
 		const [result] = await db.query(getQuery, [req.id, pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
@@ -76,15 +76,15 @@ export const getOne = async (req, res) => {
 		const { id: userId } = req;
 
 		const getQuery = `
-            SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
-            p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
-            p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
-            p.created_at, p.updated_at FROM cart AS c
-            JOIN products AS p
-            ON p.id = c.product_id
-            WHERE c.user_id = ?
-            AND c.id = ?
-        `;
+      SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
+      p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
+      p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
+      p.created_at, p.updated_at FROM cart AS c
+      JOIN products AS p
+      ON p.id = c.product_id
+      WHERE c.user_id = ?
+      AND c.id = ?
+    `;
 		const [[cart]] = await db.query(getQuery, [userId, cartId]);
 
 		if (!cart) {

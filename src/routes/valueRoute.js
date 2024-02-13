@@ -6,10 +6,10 @@ import roleGuard from "../middlewares/roleGuard.js";
 
 const valueRoute = Router();
 
-valueRoute.post("/", ...roleGuard("moderator"), addValueValidator, add);
-valueRoute.get("/", ...roleGuard("moderator"), getAllValuesValidator, getAll);
-valueRoute.get("/:id", ...roleGuard("moderator"), isId, getOne);
-valueRoute.patch("/:id", ...roleGuard("moderator"), updateValueValidator, isId, update);
-valueRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
+valueRoute.post("/", ...roleGuard("admin"), addValueValidator, add);
+valueRoute.get("/", getAllValuesValidator, getAll);
+valueRoute.get("/:id", isId, getOne);
+valueRoute.patch("/:id", ...roleGuard("admin"), updateValueValidator, isId, update);
+valueRoute.delete("/:id", ...roleGuard("admin"), isId, remove);
 
 export default valueRoute;

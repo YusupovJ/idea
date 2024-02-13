@@ -3,9 +3,13 @@ import { isUzMobilePhone, paginationQuery } from "./customValidators.js";
 
 export const updateUserValidator = [
 	body("name").optional().isLength({ min: 2 }).withMessage("name must have at least 2 letters"),
-	body("email").optional().isEmail().withMessage("inccrrect email"),
+	body("email").optional().isEmail().withMessage("incorrect email"),
 	body("password").optional().isLength({ min: 8 }).withMessage("password must have at least 8 characters"),
 	body("phone").optional().custom(isUzMobilePhone).withMessage("incorrect phone"),
+	body("user")
+		.optional()
+		.custom((input) => ["admin", "user"].includes(input))
+		.withMessage("role can be user or admin"),
 ];
 
 export const getAllUserValidator = [

@@ -40,7 +40,7 @@ export const register = async (req, res) => {
 		const accessToken = token.generateAccessToken(addedUser.insertId, "user");
 		const refreshToken = token.generateRefreshToken(addedUser.insertId, "user");
 
-		apiResponse(res).send({ accessToken, refreshToken }, null, 201);
+		apiResponse(res).send({ id: addedUser.insertId, name, email, phone, role: "user", accessToken, refreshToken }, null, 201);
 
 		updateUserRefreshToken(refreshToken, addedUser.insertId);
 	} catch (error) {
@@ -69,10 +69,13 @@ export const login = async (req, res) => {
 		const accessToken = token.generateAccessToken(user.id, user.role);
 		const refreshToken = token.generateRefreshToken(user.id, user.role);
 
-		apiResponse(res).send({ accessToken, refreshToken });
+		let { id, name, phone, role } = user;
+
+		apiResponse(res).send({ id, name, email, phone, role, accessToken, refreshToken });
 
 		updateUserRefreshToken(refreshToken, user.id);
 	} catch (error) {
+		console.log(error);
 		apiResponse(res).throw(error);
 	}
 };
@@ -123,10 +126,10 @@ export const me = async (req, res) => {
 	try {
 		const { id } = req;
 		const getQuery = `
-            SELECT id, name, email, phone, role, created_at, updated_at 
-            FROM users 
-            WHERE id = ?
-        `;
+      SELECT id, name, email, phone, role, created_at, updated_at 
+      FROM users 
+      WHERE id = ?
+    `;
 		const [[user]] = await db.query(getQuery, id);
 
 		apiResponse(res).send(user);

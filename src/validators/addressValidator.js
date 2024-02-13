@@ -12,6 +12,7 @@ export const addAddressValidator = [
 export const getAllAddressValidator = [
 	query("page").optional().custom(paginationQuery).withMessage("page must be an integer and no less than 1"),
 	query("limit").optional().custom(paginationQuery).withMessage("limit must be an integer and no less than 1"),
+	query("search").optional().isString().withMessage("search must be string"),
 ];
 
 export const updateAddressValidator = [

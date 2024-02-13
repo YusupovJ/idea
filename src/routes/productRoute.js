@@ -6,10 +6,10 @@ import { isId } from "../validators/customValidators.js";
 
 const productRoute = Router();
 
-productRoute.post("/", ...roleGuard("moderator"), ...addProductValidator, add);
+productRoute.post("/", ...roleGuard("admin"), ...addProductValidator, add);
 productRoute.get("/", ...getAllProductsValidator, getAll);
 productRoute.get("/:id", isId, getOne);
-productRoute.patch("/:id", ...roleGuard("moderator"), isId, ...updateProductValidator, update);
-productRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
+productRoute.patch("/:id", ...roleGuard("admin"), isId, ...updateProductValidator, update);
+productRoute.delete("/:id", ...roleGuard("admin"), isId, remove);
 
 export default productRoute;

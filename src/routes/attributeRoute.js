@@ -9,10 +9,10 @@ const attributeRoute = Router();
 
 attributeRoute.use("/values", valueRoute);
 
-attributeRoute.post("/", ...roleGuard("moderator"), addAttributeValidator, add);
-attributeRoute.get("/", ...roleGuard("moderator"), getAllAttributesValidator, getAll);
-attributeRoute.get("/:id", ...roleGuard("moderator"), isId, getOne);
-attributeRoute.patch("/:id", ...roleGuard("moderator"), updateAttributeValidator, isId, update);
-attributeRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
+attributeRoute.post("/", ...roleGuard("admin"), addAttributeValidator, add);
+attributeRoute.get("/", getAllAttributesValidator, getAll);
+attributeRoute.get("/:id", isId, getOne);
+attributeRoute.patch("/:id", ...roleGuard("admin"), updateAttributeValidator, isId, update);
+attributeRoute.delete("/:id", ...roleGuard("admin"), isId, remove);
 
 export default attributeRoute;

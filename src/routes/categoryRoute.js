@@ -6,10 +6,10 @@ import { isId } from "../validators/customValidators.js";
 
 const categoryRoute = Router();
 
-categoryRoute.post("/", ...roleGuard("moderator"), ...addCategoryValidator, add);
+categoryRoute.post("/", ...roleGuard("admin"), ...addCategoryValidator, add);
 categoryRoute.get("/", ...getAllCategorysValidator, getAll);
 categoryRoute.get("/:id", isId, getOne);
-categoryRoute.patch("/:id", ...roleGuard("moderator"), ...updateCategoryValidator, isId, update);
-categoryRoute.delete("/:id", ...roleGuard("moderator"), isId, remove);
+categoryRoute.patch("/:id", ...roleGuard("admin"), ...updateCategoryValidator, isId, update);
+categoryRoute.delete("/:id", ...roleGuard("admin"), isId, remove);
 
 export default categoryRoute;

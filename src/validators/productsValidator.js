@@ -2,12 +2,8 @@ import { body, query } from "express-validator";
 import { paginationQuery } from "./customValidators.js";
 
 export const addProductValidator = [
-	body("name_uz").notEmpty().withMessage("name_uz must be string"),
-	body("name_ru").notEmpty().withMessage("name_ru must be string"),
-	body("desc_ru").notEmpty().withMessage("desc_ru must be string"),
-	body("desc_uz").notEmpty().withMessage("desc_uz must be string"),
-	body("desc_short_uz").notEmpty().withMessage("desc_short_uz must be string"),
-	body("desc_short_ru").notEmpty().withMessage("desc_short_ru must be string"),
+	body("title").notEmpty().withMessage("title must be string"),
+	body("description").notEmpty().withMessage("description must be string"),
 	body("count").notEmpty().isInt({ min: 1 }).withMessage("count must be at least 1"),
 	body("images").optional().isArray().withMessage("images must be an array of image urls"),
 	body("price").notEmpty().isInt({ min: 100 }).withMessage("price must be at least 100"),
@@ -35,12 +31,8 @@ export const getAllProductsValidator = [
 ];
 
 export const updateProductValidator = [
-	body("name_uz").optional().isString().withMessage("name_uz must be string"),
-	body("name_ru").optional().isString().withMessage("name_ru must be string"),
-	body("desc_ru").optional().isString().withMessage("desc_ru must be string"),
-	body("desc_uz").optional().isString().withMessage("desc_uz must be string"),
-	body("desc_short_uz").optional().isString().withMessage("desc_short_uz must be string"),
-	body("desc_short_ru").optional().isString().withMessage("desc_short_ru must be string"),
+	body("title").optional().isString().withMessage("name_uz must be string"),
+	body("description").optional().isString().withMessage("description must be string"),
 	body("count").optional().isInt({ min: 1 }).withMessage("count must be at least 1"),
 	body("images").optional().isArray().withMessage("images must be an array of image urls"),
 	body("price").optional().isInt({ min: 100 }).withMessage("price must be at least 100"),

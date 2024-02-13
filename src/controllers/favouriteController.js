@@ -42,12 +42,12 @@ export const getAll = async (req, res) => {
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
-            SELECT * FROM users_products AS up
-            JOIN products AS p
-            ON p.id = up.products_id
-            WHERE up.users_id = ?
-            LIMIT ? OFFSET ? 
-        `;
+      SELECT * FROM users_products AS up
+      JOIN products AS p
+      ON p.id = up.products_id
+      WHERE up.users_id = ?
+      LIMIT ? OFFSET ? 
+    `;
 		const [result] = await db.query(getQuery, [userId, pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
@@ -79,10 +79,10 @@ export const remove = async (req, res) => {
 		const { id: userId } = req;
 
 		const getQuery = `
-            SELECT * FROM users_products
-            WHERE products_id = ?
-            AND users_id = ?
-        `;
+      SELECT * FROM users_products
+      WHERE products_id = ?
+      AND users_id = ?
+    `;
 		const [[favourite]] = await db.query(getQuery, [productId, userId]);
 
 		if (!favourite) {
@@ -90,10 +90,10 @@ export const remove = async (req, res) => {
 		}
 
 		const delQuery = `
-            DELETE FROM users_products
-            WHERE products_id = ?
-            AND users_id = ?
-        `;
+      DELETE FROM users_products
+      WHERE products_id = ?
+      AND users_id = ?
+    `;
 		await db.query(delQuery, [productId, userId]);
 
 		apiResponse(res).send("Product removed from favourites");

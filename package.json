@@ -1,11 +1,12 @@
 {
-	"name": "kishmish-market",
+	"name": "idea",
 	"version": "1.0.0",
-	"description": "market with a lot of products",
+	"description": "online shop",
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon ./src/index.js"
+		"dev": "nodemon ./src/index.js",
+		"start": "node ./src/index.js"
 	},
 	"keywords": [],
 	"author": "Jamshid",
@@ -16,7 +17,9 @@
 		"express": "^4.18.2",
 		"express-validator": "^7.0.1",
 		"jsonwebtoken": "^9.0.2",
-		"mysql2": "^3.6.3"
+		"mysql2": "^3.6.3",
+		"swagger-jsdoc": "^6.2.8",
+		"swagger-ui-express": "^5.0.0"
 	},
 	"devDependencies": {
 		"nodemon": "^3.0.1"

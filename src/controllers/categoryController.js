@@ -33,12 +33,9 @@ export const add = async (req, res) => {
 
 		const { body } = req;
 		const newCategory = {
-			name_uz: body.name_uz,
-			name_ru: body.name_ru,
-			desc_uz: body.desc_uz,
-			desc_ru: body.desc_ru,
+			name: body.name,
+			description: body.description,
 			image: body.image,
-			parent_id: body.parent_id,
 		};
 
 		const addQuery = "INSERT INTO categories SET ?";
@@ -60,13 +57,13 @@ export const getAll = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const geTotalItemsQuery = "SELECT COUNT(id) FROM categories WHERE parent_id IS NULL";
+		const geTotalItemsQuery = "SELECT COUNT(id) FROM categories";
 		const [[{ "COUNT(id)": totalItems }]] = await db.query(geTotalItemsQuery);
 
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
-		const getQuery = "SELECT * FROM categories WHERE parent_id IS NULL LIMIT ? OFFSET ?";
+		const getQuery = "SELECT * FROM categories LIMIT ? OFFSET ?";
 		const [categories] = await db.query(getQuery, [pagination.limit, pagination.offset]);
 
 		apiResponse(res).send(categories, pagination);
@@ -88,8 +85,8 @@ export const getOne = async (req, res) => {
 			throw new NotFound("Category not found");
 		}
 
-		const updateViewsQuery = "UPDATE categories SET views = views + 1";
-		await db.query(updateViewsQuery);
+		const updateViewsQuery = "UPDATE categories SET views = views + 1 WHERE id = ?";
+		await db.query(updateViewsQuery, id);
 
 		const getAttrQuery = `
 			SELECT * FROM attributes_categories AS ac

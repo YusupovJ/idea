@@ -5,7 +5,7 @@ CREATE TABLE `users` (
   `name` varchar(255),
   `email` varchar(255) UNIQUE,
   `password` varchar(255),
-  `role` ENUM ('user', 'admin', 'moderator', 'deliver'),
+  `role` ENUM ('user', 'admin', 'deliver'),
   `refresh_token` text,
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW(),
@@ -14,12 +14,8 @@ CREATE TABLE `users` (
 
 CREATE TABLE `products` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `name_uz` varchar(255),
-  `name_ru` varchar(255),
-  `desc_uz` text,
-  `desc_ru` text,
-  `desc_short_uz` text,
-  `desc_short_ru` text,
+  `title` varchar(255),
+  `description` text,
   `count` integer,
   `views` integer DEFAULT 0,
   `orders` integer DEFAULT 0,
@@ -32,21 +28,17 @@ CREATE TABLE `products` (
 
 CREATE TABLE `categories` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `name_uz` varchar(255),
-  `name_ru` varchar(255),
-  `desc_uz` text,
-  `desc_ru` text,
+  `name` varchar(255),
+  `description` text,
   `views` integer DEFAULT 0,
   `image` varchar(255),
-  `parent_id` integer,
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW()
 );
 
 CREATE TABLE `events` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `name_uz` varchar(255),
-  `name_ru` varchar(255),
+  `name` varchar(255),
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW()
 );
@@ -56,18 +48,6 @@ CREATE TABLE `cart` (
   `product_id` integer,
   `user_id` integer,
   `count` integer
-);
-
-CREATE TABLE `reviews` (
-  `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `user_id` integer,
-  `product_id` integer,
-  `text` text,
-  `rating` float,
-  `image` text,
-  `created_at` datetime DEFAULT NOW(),
-  `updated_at` datetime DEFAULT NOW(),
-  `answer_to` integer
 );
 
 CREATE TABLE `address` (
@@ -106,28 +86,18 @@ CREATE TABLE `orders` (
 
 CREATE TABLE `attributes` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `name_uz` varchar(255),
-  `name_ru` varchar(255)
+  `name` varchar(255)
 );
 
 CREATE TABLE `attribute_values` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
-  `attribute_id` integer,
-  `value_uz` varchar(255),
-  `value_ru` varchar(255)
+  `value` varchar(255),
+  `attribute_id` integer
 );
-
-ALTER TABLE `categories` ADD FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `cart` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `cart` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `reviews` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE `reviews` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `reviews` ADD FOREIGN KEY (`answer_to`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `address` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -198,4 +168,4 @@ ALTER TABLE `users_products` ADD FOREIGN KEY (`products_id`) REFERENCES `product
 
 -- migrate:down
 
-DROP DATABASE kishmish;
+DROP DATABASE idea;
