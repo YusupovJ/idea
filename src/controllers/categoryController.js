@@ -79,9 +79,9 @@ export const getOne = async (req, res) => {
 		const { id } = req.params;
 
 		const getQuery = "SELECT * FROM categories WHERE id = ?";
-		const [[categories]] = await db.query(getQuery, id);
+		const [[category]] = await db.query(getQuery, id);
 
-		if (!categories) {
+		if (!category) {
 			throw new NotFound("Category not found");
 		}
 
@@ -97,9 +97,9 @@ export const getOne = async (req, res) => {
 
 		const [attributes] = await db.query(getAttrQuery, id);
 
-		categories.attributes = attributes;
+		category.attributes = attributes;
 
-		apiResponse(res).send(categories);
+		apiResponse(res).send(category);
 	} catch (error) {
 		apiResponse(res).throw(error);
 	}

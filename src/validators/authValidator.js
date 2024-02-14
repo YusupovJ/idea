@@ -12,5 +12,3 @@ export const loginValidator = [
 	body("email").notEmpty().isEmail().withMessage("incorrect email"),
 	body("password").notEmpty().withMessage("password must be provided"),
 ];
-
-export const refreshValidator = [body("refresh_token").notEmpty().isString().withMessage("refresh_token must be provided")];

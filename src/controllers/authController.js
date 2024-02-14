@@ -40,6 +40,8 @@ export const register = async (req, res) => {
 		const accessToken = token.generateAccessToken(addedUser.insertId, "user");
 		const refreshToken = token.generateRefreshToken(addedUser.insertId, "user");
 
+		res.cookie("refreshToken", refreshToken, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+
 		apiResponse(res).send({ id: addedUser.insertId, name, email, phone, role: "user", accessToken, refreshToken }, null, 201);
 
 		updateUserRefreshToken(refreshToken, addedUser.insertId);
@@ -69,6 +71,8 @@ export const login = async (req, res) => {
 		const accessToken = token.generateAccessToken(user.id, user.role);
 		const refreshToken = token.generateRefreshToken(user.id, user.role);
 
+		res.cookie("refreshToken", refreshToken, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+
 		let { id, name, phone, role } = user;
 
 		apiResponse(res).send({ id, name, email, phone, role, accessToken, refreshToken });
@@ -84,14 +88,14 @@ export const refresh = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { refresh_token } = req.body;
-		const decodedToken = token.verifyRefreshToken(refresh_token);
+		const { refreshToken } = req.cookies;
+		const decodedToken = token.verifyRefreshToken(refreshToken);
 
 		const { id, role } = decodedToken;
 		const getQuery = "SELECT * FROM users WHERE id = ?";
 		const [[user]] = await db.query(getQuery, id);
 
-		const isTokenRight = crypt.compare(refresh_token, user.refresh_token);
+		const isTokenRight = crypt.compare(refreshToken, user.refresh_token);
 
 		if (!isTokenRight) {
 			throw new BadRequest("Your token is not valid");
@@ -99,6 +103,8 @@ export const refresh = async (req, res) => {
 
 		const newAccessToken = token.generateAccessToken(id, role);
 		const newRefreshToken = token.generateRefreshToken(id, role);
+
+		res.cookie("refreshToken", newRefreshToken, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
 		apiResponse(res).send({
 			refreshToken: newRefreshToken,
@@ -115,6 +121,8 @@ export const logout = async (req, res) => {
 	try {
 		const updateQuery = "UPDATE users SET refresh_token = NULL WHERE id = ?";
 		await db.query(updateQuery, req.id);
+
+		res.clearCookie("refreshToken", { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
 		apiResponse(res).send("You successfully logged out your account");
 	} catch (error) {

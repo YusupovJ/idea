@@ -13,6 +13,10 @@ import attributeRoute from "./attributeRoute.js";
 
 const router = Router();
 
+router.get("/", (req, res) => {
+	res.send("<h1>Hello men!</h1>");
+});
+
 router.use("/auth", authRoute);
 router.use("/products", productRoute);
 router.use("/users", userRoute);

@@ -1,7 +1,7 @@
 import apiResponse from "../helpers/apiResponse.js";
 import checkValidation from "../helpers/checkValidation.js";
 import db from "../config/db.config.js";
-import { NotFound } from "../helpers/errors.js";
+import { BadRequest, NotFound } from "../helpers/errors.js";
 import Pagination from "../helpers/pagination.js";
 
 export const add = async (req, res) => {
@@ -11,11 +11,18 @@ export const add = async (req, res) => {
 		const { product_id, count } = req.body;
 		const { id: user_id } = req;
 
-		const getQuery = "SELECT * FROM products WHERE id = ?";
-		const [[product]] = await db.query(getQuery, product_id);
+		const getProductQuery = "SELECT * FROM products WHERE id = ?";
+		const [[product]] = await db.query(getProductQuery, product_id);
 
 		if (!product) {
 			throw new NotFound("This product does not exist");
+		}
+
+		const getCartQuery = "SELECT * FROM cart WHERE product_id = ?";
+		const [[cart]] = await db.query(getCartQuery, product_id);
+
+		if (cart) {
+			throw new BadRequest("This product already exists in your product");
 		}
 
 		const newCart = { product_id, user_id, count };
@@ -39,8 +46,7 @@ export const getAll = async (req, res) => {
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
-      SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
-      p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
+      SELECT p.id AS productId, c.id AS cartId, p.title, p.description, p.count AS productCount, 
       p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
       p.created_at, p.updated_at FROM cart AS c
       JOIN products AS p
@@ -59,7 +65,7 @@ export const getAll = async (req, res) => {
 				};
 			}
 
-			return [];
+			return cart;
 		});
 
 		apiResponse(res).send(carts, pagination);
@@ -76,8 +82,7 @@ export const getOne = async (req, res) => {
 		const { id: userId } = req;
 
 		const getQuery = `
-      SELECT p.id AS productId, c.id AS cartId, p.name_uz, p.name_ru, p.desc_uz, p.desc_ru, 
-      p.desc_short_uz, p.desc_short_ru, p.count AS productCount, 
+      SELECT p.id AS productId, c.id AS cartId, p.title, p.description, p.count AS productCount, 
       p.views, p.orders, p.images, p.price, p.discount, c.count AS cartCount, 
       p.created_at, p.updated_at FROM cart AS c
       JOIN products AS p

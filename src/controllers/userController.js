@@ -59,6 +59,8 @@ export const update = async (req, res) => {
 				const refreshToken = Token.generateRefreshToken(id, updatedUser.role);
 				const hashedRefreshToken = crypt.hash(refreshToken);
 
+				res.cookie("refreshToken", refreshToken, { httpOnly: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
+
 				updatedUser.refresh_token = hashedRefreshToken;
 			}
 

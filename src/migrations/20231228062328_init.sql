@@ -39,6 +39,9 @@ CREATE TABLE `categories` (
 CREATE TABLE `events` (
   `id` integer PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255),
+  `start_date` datetime,
+  `end_date` datetime,
+  `image` text,
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW()
 );
@@ -58,6 +61,15 @@ CREATE TABLE `address` (
   `region` varchar(255),
   `street` varchar(255),
   `house` varchar(255),
+  `created_at` datetime DEFAULT NOW(),
+  `updated_at` datetime DEFAULT NOW()
+);
+
+CREATE TABLE `ratings` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `user_id` integer,
+  `rate` integer,
+  `product_id` integer,
   `created_at` datetime DEFAULT NOW(),
   `updated_at` datetime DEFAULT NOW()
 );
@@ -94,6 +106,23 @@ CREATE TABLE `attribute_values` (
   `value` varchar(255),
   `attribute_id` integer
 );
+
+CREATE TABLE `favourites` (
+  `id` integer PRIMARY KEY AUTO_INCREMENT,
+  `user_id` integer,
+  `product_id` integer,
+  `isFav` varchar(255),
+  `created_at` datetime DEFAULT NOW(),
+  `updated_at` datetime DEFAULT NOW()
+);
+
+ALTER TABLE `favourites` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE  ON UPDATE CASCADE;
+
+ALTER TABLE `favourites` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `ratings` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE  ON UPDATE CASCADE;
+
+ALTER TABLE `ratings` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `cart` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -155,16 +184,6 @@ CREATE TABLE `attributes_categories` (
 ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`attributes_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `attributes_categories` ADD FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-CREATE TABLE `users_products` (
-  `users_id` integer,
-  `products_id` integer,
-  PRIMARY KEY (`users_id`, `products_id`)
-);
-
-ALTER TABLE `users_products` ADD FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `users_products` ADD FOREIGN KEY (`products_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- migrate:down
 

@@ -8,9 +8,9 @@ export const add = async (req, res) => {
 	try {
 		checkValidation(req);
 
-		const { name } = req.body;
+		const { name, start_date, end_date, image } = req.body;
 
-		const newEvent = { name };
+		const newEvent = { name, start_date, end_date, image: image || null };
 
 		const addQuery = "INSERT INTO events SET ?";
 		await db.query(addQuery, newEvent);
@@ -46,20 +46,9 @@ export const getOne = async (req, res) => {
 
 		const { id } = req.params;
 
-		const getQuery = `
-      SELECT e.name AS event_name, p.id, p.name AS product_name, p.description,
-      p.orders, p.views, p.count, p.images, p.price, p.discount, p.created_at, p.updated_at
-      FROM events_products AS ep
-      JOIN events AS e
-      ON e.id = ep.events_id
-      JOIN products AS p
-      ON p.id = ep.products_id
-      WHERE e.id = ?
-    `;
+		const getQuery = "SELECT * FROM events WHERE id = ?";
 
 		const [[event]] = await db.query(getQuery, id);
-
-		event.images = event?.images?.split(",");
 
 		if (!event) {
 			throw new NotFound("Event not found");

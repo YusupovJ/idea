@@ -9,18 +9,18 @@ export const add = async (req, res) => {
 		checkValidation(req);
 
 		const { product_id } = req.body;
-		const { id: users_id } = req;
+		const { id: user_id } = req;
 
-		const getQuery = "SELECT * FROM users_products WHERE products_id = ?";
+		const getQuery = "SELECT * FROM favourites WHERE product_id = ?";
 		const [[favourite]] = await db.query(getQuery, product_id);
 
 		if (favourite) {
 			throw new BadRequest("You've already added this product to favourites");
 		}
 
-		const newFavourite = { products_id: product_id, users_id };
+		const newFavourite = { product_id, user_id, isFav: "true" };
 
-		const addQuery = "INSERT INTO users_products SET ?";
+		const addQuery = "INSERT INTO favourites SET ?";
 		await db.query(addQuery, newFavourite);
 
 		apiResponse(res).send("Added to favourite", null, 201);
@@ -35,26 +35,26 @@ export const getAll = async (req, res) => {
 
 		const { id: userId } = req;
 
-		const getTotalItemsQuery = "SELECT COUNT(*) FROM users_products WHERE users_id = ?";
+		const getTotalItemsQuery = "SELECT COUNT(*) FROM favourites WHERE user_id = ?";
 		const [[{ "COUNT(*)": totalItems }]] = await db.query(getTotalItemsQuery, userId);
 
 		const { page, limit } = req.query;
 		const pagination = new Pagination(totalItems, page, limit);
 
 		const getQuery = `
-      SELECT * FROM users_products AS up
+      SELECT * FROM favourites AS up
       JOIN products AS p
-      ON p.id = up.products_id
-      WHERE up.users_id = ?
-      LIMIT ? OFFSET ? 
+      ON p.id = up.product_id
+      WHERE up.user_id = ?
+      LIMIT ? OFFSET ?
     `;
 		const [result] = await db.query(getQuery, [userId, pagination.limit, pagination.offset]);
 
 		// replace "imageUrl,imageUrl" on ["imageUrl", "imageUrl"]
 		const favourites = result.map((favourite) => {
 			if (favourite.images) {
-				delete favourite.products_id;
-				delete favourite.users_id;
+				delete favourite.product_id;
+				delete favourite.user_id;
 
 				return {
 					...favourite,
@@ -62,7 +62,7 @@ export const getAll = async (req, res) => {
 				};
 			}
 
-			return [];
+			return favourite;
 		});
 
 		apiResponse(res).send(favourites, pagination);
@@ -79,9 +79,9 @@ export const remove = async (req, res) => {
 		const { id: userId } = req;
 
 		const getQuery = `
-      SELECT * FROM users_products
-      WHERE products_id = ?
-      AND users_id = ?
+      SELECT * FROM favourites
+      WHERE product_id = ?
+      AND user_id = ?
     `;
 		const [[favourite]] = await db.query(getQuery, [productId, userId]);
 
@@ -90,9 +90,9 @@ export const remove = async (req, res) => {
 		}
 
 		const delQuery = `
-      DELETE FROM users_products
-      WHERE products_id = ?
-      AND users_id = ?
+      DELETE FROM favourites
+      WHERE product_id = ?
+      AND user_id = ?
     `;
 		await db.query(delQuery, [productId, userId]);
 
