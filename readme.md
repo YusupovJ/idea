@@ -7,7 +7,7 @@
 
 ## Endpoints:
 
-### Auth:
+## Auth:
 
 `/auth/register`:
 
@@ -49,10 +49,47 @@
 
 **description**: for loging out your account  
 **need access token**: yes  
+**roles**: user, admin  
 **method**: post
 
 `/auth/me`:
 
 **description**: get info about yourself  
 **need access token**: yes  
+**roles**: user, admin  
 **method**: get
+
+## Users:
+
+`/users`:
+
+**description**: gets the list of users    
+**need access token**: yes  
+**method**: get  
+**roles**: admin  
+
+`/users/:id`:
+
+**description**: updates the user    
+**need access token**: yes    
+**roles**: admin can update any account, user can upate only own account   
+**method**: patch  
+**body example**:
+```
+{
+  name: "Jamshud changed";
+  email: "jamshudanamana_changed@gmail.com";
+  phone: "+998901234567";
+  password: "12345678-changed";
+}
+```
+
+> [!NOTE]
+> Any update(patch) endpoint requires body where all fields are optional, so you can update an entity partially! 
+ 
+`/users/:id`:
+
+**description**: deletes user  
+**need access token**: yes  
+**roles**: admin can delete any account, user can delete only own account  
+**method**: delete
